@@ -1,0 +1,11 @@
+# run: conda env create --file environment.yml
+name: autodetect
+channels:
+  - pytorch
+  - defaults
+dependencies:
+  - python=3.6
+  - numpy=1.16.4
+  - pytorch=0.4.0
+  - scikit-learn=0.21.2
+  - scipy=1.2.1
