@@ -20,7 +20,7 @@ sys.path.insert(0, os.path.abspath('..'))
 # -- Project information -----------------------------------------------------
 
 project = 'autodetect'
-copyright = '2019, Lang Liu'
+copyright = '2019, Lang Liu, Joseph Salmon, and Zaid Harchaoui.'
 author = 'Lang Liu'
 
 # The short X.Y version
