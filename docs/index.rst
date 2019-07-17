@@ -7,7 +7,7 @@ Autodetect
 ==========
 
 :class:`Autodetect` is a package for a score-based change detection method, *autograd-test*, that can automatically report hidden changes in machine learning systems as they learn from a continuous, possibly evolving, stream of data.
-This is code accompanying the paper "`Score-based Change Detection for Gradient-based Learning Machines <https://www.stat.washington.edu/~liu16/papers/autograd-test-2019.pdf>`_".
+This is code accompanying the paper "`Score-based Change Detection for Gradient-based Learning Machines <https://stat.uw.edu/sites/default/files/2019-07/tr652.pdf>`_".
 The package is licensed under the GPLv3 license.
 
 Overview
@@ -70,7 +70,8 @@ If you use this code, please cite::
 
 Acknowledgments
 ---------------
-This work was supported by NSF Award CCF-1740551 and the program “Learning in Machines and Brains” of CIFAR.
+This work was supported by NSF CCF-1740551, NSF DMS-1810975, the program “Learning in
+Machines and Brains” of CIFAR, and faculty research awards.
 
 |adsi|_
 |nbsp| |nbsp| |nbsp| |nbsp|
