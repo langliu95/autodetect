@@ -19,7 +19,7 @@ from .utils import _update_res
 
 
 def _score_information(theta, obs, loglike):
-    """Computes score function and information matrix.
+    """Compute score function and information matrix.
 
     The information matrix here is computed by the outer product of the score function.
     """
@@ -34,7 +34,7 @@ def _score_information(theta, obs, loglike):
 
 
 def score_function(theta, obs, loglike):
-    """Computes score function.
+    """Compute score function.
 
     Parameters
     ----------
@@ -51,7 +51,7 @@ def score_function(theta, obs, loglike):
 
 
 def information(theta, obs, loglike, ident=None):
-    """Computes score function and information matrix.
+    """Compute score function and information matrix.
 
     Parameters
     ----------
@@ -79,8 +79,8 @@ def information(theta, obs, loglike, ident=None):
 
 
 def autograd_test(theta, obs, loglike, alpha=0.05, lag=0, idx=None, prange=None,
-    trange=None, stat_type='autograd'):
-    """Computes autograd-test statistics.
+                  trange=None, stat_type='autograd'):
+    """Compute autograd-test statistics.
 
     This function performs score-based hypothesis tests to detect the existence of
     a change in machine learning systems as they learn from
@@ -148,14 +148,15 @@ def autograd_test(theta, obs, loglike, alpha=0.05, lag=0, idx=None, prange=None,
     # then returns the one(s) based on ``stat_type``.
     theta.requires_grad_(True)
     alpha, idx, prange, trange = _exceptions_handling(len(obs), len(theta), alpha,
-        lag, idx, prange, trange, stat_type)
+                                                      lag, idx, prange, trange,
+                                                      stat_type)
     # computes the inverse of information matrix once
     ident = torch.eye(len(theta))
     score, info = information(theta, obs, loglike, ident)
     Iinv = _compute_inv(ident, info)
     # computes thresholds once
     thresh = compute_thresholds(len(idx), max([1, max(trange) - min(trange)]),
-        alpha, prange, stat_type)
+                                alpha, prange, stat_type)
     # computes test statistic
     stat = torch.zeros(3)
     tau = np.array([0, 0, 0])
@@ -167,7 +168,7 @@ def autograd_test(theta, obs, loglike, alpha=0.05, lag=0, idx=None, prange=None,
             score -= score_t
             info -= info_t
             new_stat, new_index = _compute_stats(prange, idx, score, info, Iinv,
-                thresh, stat_type)
+                                                 thresh, stat_type)
             stat, index, tau = _update_res(new_stat, stat, new_index, index, hi, tau)
     else:  # non-Markovian dependency
         for t in trange:
@@ -175,13 +176,13 @@ def autograd_test(theta, obs, loglike, alpha=0.05, lag=0, idx=None, prange=None,
             score_t = score - score_t
             info_t = info - info_t
             new_stat, new_index = _compute_stats(prange, idx, score, info, Iinv,
-                thresh, stat_type)
+                                                 thresh, stat_type)
             stat, index, tau = _update_res(new_stat, stat, new_index, index, t, tau)
     return _return_results(stat, index, tau, stat_type)
 
 
 def _arma_einformation(theta, obs, p, q, ident=None):
-    """Computes score function and information matrix for error term.
+    """Compute score function and information matrix for error term.
 
     The observations must be one-dimensional.
 
@@ -206,8 +207,7 @@ def _arma_einformation(theta, obs, p, q, ident=None):
         # computes errors
         inv_idx = torch.arange(t-1, t-p-1, -1).long()
         inv_ide = torch.arange(t-1, t-q-1, -1).long()
-        error = x[t] - torch.sum(theta[:p] * x[inv_idx]) -\
-            torch.sum(theta[p:(p+q)] * e[inv_ide])
+        error = x[t] - torch.sum(theta[:p] * x[inv_idx]) - torch.sum(theta[p:(p+q)] * e[inv_ide])
         e[t] = error.detach()
         # computes score
         score_t = grad(error, theta)[0].detach()
@@ -220,7 +220,7 @@ def _arma_einformation(theta, obs, p, q, ident=None):
 
 
 def arma_information(error, escore, einfo, sig2):
-    """Computes the score and information for ARMA based on the ones of errors.
+    """Compute the score and information for ARMA based on the ones of errors.
     """
     score = -(torch.sum(error[:, np.newaxis] * escore, 0)) / sig2
     info = (escore.transpose(0, 1) @ escore -
@@ -230,7 +230,7 @@ def arma_information(error, escore, einfo, sig2):
 
 def autograd_arma(theta, sig2, obs, p, q, alpha=0.05, idx=None, prange=None, trange=None,
     stat_type='autograd'):
-    """Computes autograd-test statistics for autoregressive--moving-average model.
+    """Compute autograd-test statistics for autoregressive--moving-average model.
 
     This function performs score-based hypothesis tests to detect the existence of
     a change in an autoregressive--moving-average model as
@@ -294,7 +294,8 @@ def autograd_arma(theta, sig2, obs, p, q, alpha=0.05, idx=None, prange=None, tra
     if obs.shape[1] != 2:
         raise ValueError('Only one-dimensional time series is supported.')
     alpha, idx, prange, trange = _exceptions_handling(len(obs), len(theta), alpha,
-        max(p, q), idx, prange, trange, stat_type)
+                                                      max(p, q), idx, prange,
+                                                      trange, stat_type)
     # computes the inverse of information matrix once
     ident = torch.eye(len(theta))
     escore, einfo = _arma_einformation(theta, obs, p, q, ident)
@@ -302,7 +303,7 @@ def autograd_arma(theta, sig2, obs, p, q, alpha=0.05, idx=None, prange=None, tra
     Iinv = _compute_inv(ident, info)
     # computes thresholds once
     thresh = compute_thresholds(len(idx), max([1, max(trange) - min(trange)]),
-        alpha, prange, stat_type)
+                                alpha, prange, stat_type)
     # computes test statistic
     stat = torch.zeros(3)
     tau = np.array([0, 0, 0])
@@ -313,6 +314,6 @@ def autograd_arma(theta, sig2, obs, p, q, alpha=0.05, idx=None, prange=None, tra
         score_t = score - score_t
         info_t = info - info_t
         new_stat, new_index = _compute_stats(prange, idx, score_t, info_t, Iinv,
-            thresh, stat_type)
+                                             thresh, stat_type)
         stat, index, tau = _update_res(new_stat, stat, new_index, index, t, tau)
     return _return_results(stat, index, tau, stat_type)

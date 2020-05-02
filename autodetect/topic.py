@@ -17,7 +17,7 @@ from .utils import _update_res
 
 
 def _count_freq(seq, num):
-    """Counts frequencies and pairs.
+    """Count frequencies and pairs.
 
     Parameters
     ----------
@@ -63,17 +63,15 @@ class AutogradTopic():
     def __init__(self, num_cat, num_hid, init=None):
         super(AutogradTopic, self).__init__()
         self._init = init
-        self._emis = np.zeros(num_cat - num_hid)
-            # effective parameters of the emission matrix
-        self._cats = np.zeros(num_cat - num_hid, int)
-            # corresponding category of _emis
+        self._emis = np.zeros(num_cat - num_hid)  # effective parameters of the emission matrix
+        self._cats = np.zeros(num_cat - num_hid, int)  # corresponding category of _emis
         self._tran = np.zeros(num_hid * (num_hid - 1))
         self.embed = np.zeros(num_cat, int)
         self.num_cat = num_cat
         self.num_hid = num_hid
 
     def get_transition(self):
-        """Gets transition matrix."""
+        """Get transition matrix."""
         subQ = self._tran.reshape(self.num_hid, -1)
         Q = np.zeros((self.num_hid, self.num_hid))
         Q[:, :-1] = subQ
@@ -81,7 +79,7 @@ class AutogradTopic():
         return Q
 
     def get_emission(self):
-        """Gets emission matrix."""
+        """Get emission matrix."""
         num_cat = len(self.embed)
         num_hid = np.max(self.embed) + 1
         G = np.zeros((num_hid, num_cat))
@@ -95,12 +93,12 @@ class AutogradTopic():
         return G
 
     def write_transition(self, tran):
-        """Writes transition matrix."""
+        """Write transition matrix."""
         Q = tran[:, :-1]
         self._tran = Q.reshape(-1)
 
     def write_emission(self, emis):
-        """Writes emission matrix.
+        """Write emission matrix.
 
         Also updates the embedding scheme from categories to hidden states.
         """
@@ -112,11 +110,11 @@ class AutogradTopic():
                              constraint for the topic model')
         embed[obs] = states
         self.embed = embed
-        # writes emission parameters and corresponding categories of them
+        # write emission parameters and corresponding categories of them
         pos = self.num_cat - self.num_hid - 1  # current position of self_emis
         self_emis = np.zeros(pos + 1)
         self_cats = np.arange(pos + 1)
-        # excludes the last non-zero entry for each column in emission matrix.
+        # exclude the last non-zero entry for each column in emission matrix.
         exclude = np.zeros(self.num_hid)
         for k in range(self.num_cat - 1, -1, -1):
             if exclude[embed[k]] != 0:
@@ -153,9 +151,9 @@ class AutogradTopic():
         count = np.zeros((self.num_cat, self.num_cat), int)  # count pairs
         for w in np.arange(len(obs)):
             if w != len(obs) - 1:
-                count[obs[w], obs[w+1]] += 1
+                count[obs[w], obs[w + 1]] += 1
             if w != 0:
-                count[obs[w], obs[w-1]] += 1
+                count[obs[w], obs[w - 1]] += 1
         num_of_content = transform(count.sum(1))
         num_of_context = transform(count.sum(0))
         count = transform(count)
@@ -174,7 +172,7 @@ class AutogradTopic():
         return embed
 
     def mle(self, obs, embed, interpolation=False):
-        """Computes maximum likelihood estimator assuming no change exists.
+        """Compute maximum likelihood estimator assuming no change exists.
 
         Parameters
         ----------
@@ -204,14 +202,13 @@ class AutogradTopic():
         for i in range(N):
             for j in range(N):
                 if interpolation:
-                    Q[i, j] = 0.9 * countq[i, j] / (countx[i] - (embed[obs[-1]]\
-                        == i)) + 0.1 * countx[j] / len(obs)
+                    Q[i, j] = 0.9 * countq[i, j] / (countx[i] - (embed[obs[-1]] == i)) + 0.1 * countx[j] / len(obs)
                 else:
                     Q[i, j] = countq[i, j] / (countx[i] - (embed[obs[-1]] == i))
         return G, Q
 
     def train(self, obs, transform=np.sqrt, alpha=0.75, interpolation=False):
-        """Trains the model.
+        """Train the model.
 
         Parameters
         ----------
@@ -232,7 +229,7 @@ class AutogradTopic():
         self.write_emission(G)
 
     def cond_loglike(self, obs):
-        """Computes conditional (on ``obs[0]``) log-likelihood."""
+        """Compute conditional (on ``obs[0]``) log-likelihood."""
         G = self.get_emission()
         Q = self.get_transition()
         states = self.embed[obs]
@@ -241,18 +238,17 @@ class AutogradTopic():
         return cond_loglike, states
 
     def log_like(self, obs):
-        """Computes log-likelihood."""
+        """Compute log-likelihood."""
         nu = self._init
         G = self.get_emission()
         if nu is None:
             raise ValueError("No initial distribution is given")
         else:
             cond_loglike, states = self.cond_loglike(obs)
-            return np.log(nu[states[0]]) + np.log(G[states[0], obs[0]]) +\
-                cond_loglike(obs)
+            return np.log(nu[states[0]]) + np.log(G[states[0], obs[0]]) + cond_loglike(obs)
 
     def information(self, obs, freq_cats=None, freq_pairs=None):
-        """Computes score and information.
+        """Compute score and information.
 
         Parameters
         ----------
@@ -276,7 +272,7 @@ class AutogradTopic():
             freq_cats, _ = _count_freq(obs, M)
         if freq_pairs is None:
             _, freq_pairs = _count_freq(embed[obs], N)
-        # constructs the last word types in each column of emission matrix.
+        # construct the last word types in each column of emission matrix.
         last_word = np.setdiff1d(np.arange(M), cats)
         last_hid2word = np.arange(N)
         last_hid2word[embed[last_word]] = last_word
@@ -287,20 +283,19 @@ class AutogradTopic():
         for d, w in enumerate(cats):
             last = last_hid2word[embed[w]]  # last category with state ``embed[w]``
             score[d] = freq_cats[w] / G[embed[w], w] - freq_cats[last] / G[embed[w], last]
-            catsembedw = np.arange(M - N)[embed[cats] == embed[w]]
-                # categories with state embed[w]
+            catsembedw = np.arange(M - N)[embed[cats] == embed[w]] # categories with state embed[w]
             info[d, catsembedw] = freq_cats[last] / G[embed[w], last]**2
             info[catsembedw, d] = freq_cats[last] / G[embed[w], last]**2
             info[d, d] += freq_cats[w] / G[embed[w], w]**2
         for i in range(N):
-            ind = M - N + np.arange(i*(N-1), (i+1)*(N-1))
-            score[ind] = freq_pairs[i, :-1] / Q[i, :-1] - freq_pairs[i, N-1] / Q[i, N-1]
-            info[np.ix_(ind, ind)] = freq_pairs[i, N-1] / Q[i, N-1]**2
+            ind = M - N + np.arange(i * (N - 1), (i + 1) * (N - 1))
+            score[ind] = freq_pairs[i, :-1] / Q[i, :-1] - freq_pairs[i, N - 1] / Q[i, N - 1]
+            info[np.ix_(ind, ind)] = freq_pairs[i, N - 1] / Q[i, N - 1]**2
             info[ind, ind] += freq_pairs[i, :-1] / Q[i, :-1]**2
         return score, info
 
     def compute_stats(self, obs, alpha=0.05, idx=None, prange=None, trange=None, stat_type='autograd'):
-        """Computes test statistics.
+        """Compute test statistics.
 
         This function performs score-based hypothesis tests to detect the existence of a change in a text topic (Brown) model as it learns from
         a continuous, possibly evolving, stream of data.
@@ -353,9 +348,10 @@ class AutogradTopic():
 
         embed = self.embed
         dim = self.num_cat + self.num_hid * (self.num_hid - 2)
-        alpha, idx, prange, trange = _exceptions_handling(len(obs), dim, alpha, 0,
-            idx, prange, trange, stat_type)
-        # computes the inverse of information matrix once
+        alpha, idx, prange, trange = _exceptions_handling(len(obs), dim, alpha,
+                                                          0, idx, prange,
+                                                          trange, stat_type)
+        # compute the inverse of information matrix once
         county, _ = _count_freq(obs, self.num_cat)
         _, countq = _count_freq(embed[obs], self.num_hid)
         ident = np.identity(dim)
@@ -363,28 +359,30 @@ class AutogradTopic():
         const = 0
         while True:
             try:
-                Iinv = np.linalg.solve(info + const*ident, ident)
+                Iinv = np.linalg.solve(info + const * ident, ident)
                 break
             except np.linalg.LinAlgError:
                 const += 0.1
                 if np.isnan(info).any():
-                    print("NAN emerges during the computation of information matrix.")
+                    print("NAN while computing the information matrix.")
                     print("Please increase the sample size.")
                     return 0
-        # computes thresholds once
-        thresh = compute_thresholds(len(idx), max([1, max(trange) - min(trange)]),
-            alpha, prange, stat_type)
-        # computes test statistic
+        # compute thresholds once
+        thresh = compute_thresholds(len(idx),
+                                    max([1, max(trange) - min(trange)]),
+                                    alpha, prange, stat_type)
+        # compute test statistic
         seg = np.concatenate((np.array([0]), np.array(trange) + 1))  # two consecutive changepoints
         stat = np.zeros(3)
         tau = np.array([0, 0, 0])
         index = [idx, np.arange(max(prange)), idx]
         for k, t in enumerate(trange):
-            for s in range(seg[k], seg[k+1]):
+            for s in range(seg[k], seg[k + 1]):
                 county[obs[s]] -= 1
-                if s > 0: countq[embed[obs[s-1]], embed[obs[s]]] -= 1
+                if s > 0: countq[embed[obs[s - 1]], embed[obs[s]]] -= 1
             score, info = self.information(obs[trange[k]:], county, countq)
             new_stat, new_index = _compute_stats(prange, idx, score, info,
                                                  Iinv, thresh, stat_type)
-            stat, index, tau = _update_res(new_stat, stat, new_index, index, t, tau)
+            stat, index, tau = _update_res(new_stat, stat, new_index, index,
+                                           t, tau)
         return _return_results(stat, index, tau, stat_type)

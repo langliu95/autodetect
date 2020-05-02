@@ -9,12 +9,9 @@ from __future__ import absolute_import, division, print_function
 import math
 
 import numpy as np
-import numpy.random as npr
 from scipy.special import chdtri
 from scipy.stats import chi2
 import torch
-from torch.autograd import grad
-import torch.nn as nn
 
 
 ##########################################################################
@@ -22,7 +19,7 @@ import torch.nn as nn
 ##########################################################################
 
 def _log_comb(a, b, part):
-    """Computes log combinatorics choosing a from b.
+    """Compute log combinatorics choosing a from b.
 
     Parameters
     ----------
@@ -30,12 +27,12 @@ def _log_comb(a, b, part):
         Partial sums of :math:`\\log(d!)`, where :math:`a, b <= d`.
     """
     if (a <= b) & (a >= 0):
-        return part[b] - part[a] - part[b-a]
+        return part[b] - part[a] - part[b - a]
     return -math.inf
 
 
 def _log_card(p, d):
-    """Computes log cardinality of the feasible space.
+    """Compute log cardinality of the feasible space.
 
     Parameters
     ----------
@@ -47,13 +44,13 @@ def _log_card(p, d):
     Return:
         Log cardinality of the feasible space.
     """
-    log_part_sum = np.concatenate((np.array([0]),\
-        np.cumsum(np.log(np.arange(d) + 1))))
+    log_part_sum = np.concatenate((np.array([0]),
+                                   np.cumsum(np.log(np.arange(d) + 1))))
     return _log_comb(p, d, log_part_sum)
 
 
 def _theo_crit(p, d, n, alpha):
-    """Computes theoretical critical value H_{p,n}.
+    """Compute theoretical critical value H_{p,n}.
 
     Parameters
     ----------
@@ -63,33 +60,17 @@ def _theo_crit(p, d, n, alpha):
         Dimension of parameters of interest (in which change is detected).
     """
 
-    log_prob = math.log(alpha) - math.log(n) - _log_card(p, d) - 2*math.log(p+1)
-    return (chdtri(p, math.exp(log_prob)) - p) / math.sqrt(2*p)
-
-
-# def _theo_crit(p, d, n, alpha):
-#     """Computes theoretical critical value H_{p,n}.
-
-#     Parameters
-#     ----------
-#     p: int
-#         Number of changed components.
-#     d: int
-#         Dimension of parameters of interest (in which change is detected).
-#     """
-
-#     common = _log_card(p, d) + math.log(n*(p+1)**2/alpha)
-#     return math.sqrt(2/p)*common + math.sqrt(2*common)
+    log_prob = math.log(alpha) - math.log(n) - _log_card(p, d) - 2 * math.log(p + 1)
+    return (chdtri(p, math.exp(log_prob)) - p) / math.sqrt(2 * p)
 
 
 def _lin_threshold(d, n, alpha):
-    """Computes critical value of chi-square distributions.
-    """
+    """Compute critical value of chi-square distributions."""
     return (chi2.ppf(1 - alpha / n, d) - d) / math.sqrt(2 * d)
 
 
 def _scan_thresholds(d, n, alpha, prange):
-    """Computes thresholds for scan statistics."""
+    """Compute thresholds for scan statistics."""
     thresh = np.zeros(len(prange))
     for j, p in enumerate(prange):
         thresh[j] = _theo_crit(p, d, n, alpha)
@@ -109,7 +90,7 @@ def compute_thresholds(d, n, alpha, prange=None, stat_type='all'):
 
 
 def sample_square_Bessel(df, path_size, T=1):
-    """Generates a sample path from square Bessel process.
+    """Generate a sample path from square Bessel process.
 
     Parameters
     ----------
@@ -130,7 +111,7 @@ def sample_square_Bessel(df, path_size, T=1):
 
 
 def sample_max_square_Bessel(df, path_size, T=1):
-    """Generates a sample from the maximum of square Bessel process.
+    """Generate a sample from the maximum of square Bessel process.
 
     Parameters
     ----------
@@ -152,7 +133,7 @@ def sample_max_square_Bessel(df, path_size, T=1):
 
 
 def quantile_max_square_Bessel(q, df, path_size, size, T=1):
-    """Generates quantiles of the maximum of square Bessel process.
+    """Generate quantiles of the maximum of square Bessel process.
 
     Parameters
     ----------
@@ -181,7 +162,7 @@ def quantile_max_square_Bessel(q, df, path_size, size, T=1):
 ##########################################################################
 
 def _compute_inv(ident, info, const=0.0):
-    """Computes inverse of observed information."""
+    """Compute inverse of observed information."""
     while True:
         try:
             Iinv, _ = torch.gesv(ident, info + const * ident)
@@ -195,7 +176,7 @@ def _compute_inv(ident, info, const=0.0):
 
 
 def _max_score(p, order, score, Ischur):
-    """Computes maximal score statistic over index sets with fixed cardinality.
+    """Compute maximal score statistic over index sets with fixed cardinality.
 
     Parameters
     ----------
@@ -234,7 +215,7 @@ def _max_score(p, order, score, Ischur):
 
 
 def _compute_normalized_stat(stat, df, thresh):
-    """Computes normalized statistic.
+    """Compute normalized statistic.
 
     Parameters
     ----------
@@ -255,7 +236,7 @@ def _compute_normalized_stat(stat, df, thresh):
 
 
 def _compute_stats(prange, idx, score, info, Iinv, thresh, stat_type='all'):
-    """Computes statistics for change point detection.
+    """Compute statistics for change point detection.
 
     Parameters
     ----------
@@ -303,8 +284,10 @@ def _compute_stats(prange, idx, score, info, Iinv, thresh, stat_type='all'):
                 new_stat[1] = _compute_normalized_stat(new_score, int(p), thresh[1][j])
             if stat_type != 'scan':
                 new_stat[2] = _compute_normalized_stat(new_score, int(p), thresh[3][j])
-            if new_stat[1] > stat[1]: stat[1], index[1] = new_stat[1], new_index
-            if new_stat[2] > stat[2]: stat[2], index[2] = new_stat[2], new_index
+            if new_stat[1] > stat[1]:
+                stat[1], index[1] = new_stat[1], new_index
+            if new_stat[2] > stat[2]:
+                stat[2], index[2] = new_stat[2], new_index
     return stat, index
 
 
@@ -319,8 +302,7 @@ def _update_mean(mean, size, inputs):
 
 
 def _compute_culinear_stat(score, info, thresh):
-    """Computes Culinear statistic.
-    """
+    """Compute Culinear statistic."""
     try:
         if type(score).__module__ == 'numpy':
             inv = np.linalg.solve(info, score)
@@ -337,7 +319,7 @@ def _compute_culinear_stat(score, info, thresh):
 ##########################################################################
 
 def _exceptions_handling(n, d, alpha, lag, idx, prange, trange, stat_type):
-    """Handles exceptions and assigns default values"""
+    """Handle exceptions and assign default values"""
     if stat_type not in ['linear', 'scan', 'autograd', 'all']:
         raise NameError("Invalid type of statistic. Only 'linear', 'scan', 'autograd', and 'all' are implemented.")
 

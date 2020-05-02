@@ -22,7 +22,7 @@ from .utils import _update_res
 class AutogradTest(object):
     """A class for autograd-test in models inherited from :class:`torch.nn.Module`.
 
-    You should define and train your model using :class:`torch.nn.Module`
+    Define and train your model using :class:`torch.nn.Module`
     before calling this class.
 
     .. note::
@@ -58,12 +58,12 @@ class AutogradTest(object):
         self._loglike = loglike
 
     def log_likelihood(self, inputs, targets):
-        """Computes log-likelihood."""
+        """Compute log-likelihood."""
         outputs = self._model(inputs).view(-1)
         return self._loglike(outputs, targets)
 
     def gradients(self):
-        """Gets gradient of model parameters.
+        """Get gradient of model parameters.
 
         Returns an 1D ``Tensor`` contains the gradient of parameters.
         """
@@ -73,11 +73,11 @@ class AutogradTest(object):
         return torch.cat(grads)
 
     def zero_grad(self):
-        """Sets gradient of the model to zero."""
+        """Set gradient of the model to zero."""
         self._model.zero_grad()
 
     def information(self, inputs, targets):
-        """Computes score function and information matrix.
+        """Compute score function and information matrix.
 
         .. note::
             This function will set gradients of the model to zero.
@@ -100,7 +100,7 @@ class AutogradTest(object):
         return torch.cat(grads).detach(), info.detach()
 
     def compute_stats(self, inputs, targets, alpha=0.05, lag=0, idx=None, prange=None, trange=None, stat_type='autograd'):
-        """Computes test statistics.
+        """Compute test statistics.
 
         This function performs score-based hypothesis tests to detect the existence of a change in machine learning systems as they learn from
         a continuous, possibly evolving, stream of data.
@@ -156,35 +156,38 @@ class AutogradTest(object):
         """
 
         alpha, idx, prange, trange = _exceptions_handling(inputs.size(0),
-            self._dim, alpha, lag, idx, prange, trange, stat_type)
+                                                          self._dim, alpha,
+                                                          lag, idx, prange,
+                                                          trange, stat_type)
         # computes the inverse of information matrix once
         ident = torch.eye(self._dim)
         score, info = self.information(inputs, targets)
         Iinv = _compute_inv(ident, info)
         # computes thresholds once
-        thresh = compute_thresholds(len(idx), max([1, max(trange) - min(trange)]),
-            alpha, prange, stat_type)
+        thresh = compute_thresholds(len(idx),
+                                    max([1, max(trange) - min(trange)]),
+                                    alpha, prange, stat_type)
         # computes test statistic
         stat = torch.zeros(3)
         tau = np.array([0, 0, 0])
         index = [idx, np.arange(max(prange)), idx]
         if lag is not None:  # fixed order of Markovian dependence
             for lo, hi in zip([lag, *trange[:-1]], trange):
-                score_t, info_t = self.information(inputs[(lo-lag):hi],
-                    targets[(lo-lag):hi])
+                score_t, info_t = self.information(inputs[(lo - lag):hi],
+                                                   targets[(lo - lag):hi])
                 score -= score_t
                 info -= info_t
                 new_stat, new_index = _compute_stats(prange, idx, score, info,
-                    Iinv, thresh, stat_type)
+                                                     Iinv, thresh, stat_type)
                 stat, index, tau = _update_res(new_stat, stat, new_index, index,
-                    hi, tau)
+                                               hi, tau)
         else:  # non-Markovian dependency
             for t in trange:
                 score_t, info_t = self.information(inputs[:t], targets[:t])
                 score_t = score - score_t
                 info_t = info - info_t
                 new_stat, new_index = _compute_stats(prange, idx, score, info,
-                    Iinv, thresh, stat_type)
+                                                     Iinv, thresh, stat_type)
                 stat, index, tau = _update_res(new_stat, stat, new_index, index,
-                    t, tau)
+                                               t, tau)
         return _return_results(stat, index, tau, stat_type)

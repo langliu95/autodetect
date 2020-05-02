@@ -72,7 +72,7 @@ Next, we run it on the first half sample.
         stat = autocusum.compute_stats(inputs[i:(i+1)], targets[i:(i+1)], thresh[-1])
         if stat > 1.0:
             rej_length = i - train_size
-            print(f"rejection at the {rej_length}-th new observation.")
+            print("rejection at the {}-th new observation.".format(rej_length))
             break
 
 Finally, we reinitialize the algorithm and run it on the second half sample.
@@ -85,7 +85,7 @@ Finally, we reinitialize the algorithm and run it on the second half sample.
         stat = autocusum.compute_stats(inputs[i:(i+1)], targets[i:(i+1)], thresh[-1])
         if stat > 1.0:
             rej_length = i - size1
-            print(f"rejection at the {rej_length}-th new observation.")
+            print("rejection at the {}-th new observation.".format(rej_length))
             break
 
 

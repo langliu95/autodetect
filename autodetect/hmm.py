@@ -19,7 +19,7 @@ from .utils import _update_res
 
 
 def _prob_mat_pars(mat):
-    """Converts a probability matrix to a tensor of effective parameters.
+    """Convert probability matrix to tensor of effective parameters.
 
     The effective parameters are the elements of the :math:`n \\times (n - 1)`
     submatrix, where constraints on the probability matrix are removed.
@@ -30,7 +30,7 @@ def _prob_mat_pars(mat):
 
 
 def _construct_prob_mat(pars, dim=None):
-    """Constructs probability matrix based on effective parameters.
+    """Construct probability matrix based on effective parameters.
 
     The effective parameters should be attained by reshaping the ``dim`` by
     ``dim - 1`` submatrix as a 1D vector by row.
@@ -42,7 +42,8 @@ def _construct_prob_mat(pars, dim=None):
     dim: int, optional
         Dimension of the probability matrix. Default is None.
     """
-    if dim is None: dim = int(len(pars)**0.5) + 1
+    if dim is None:
+        dim = int(len(pars)**0.5) + 1
     subQ = pars.view(dim, -1)
     Q = torch.zeros((dim, dim))
     Q[:, :-1] = subQ
@@ -93,16 +94,16 @@ class AutogradHmm(object):
         self._const = torch.tensor([])
 
     def parameters(self):
-        """Gets model parameters."""
+        """Get model parameters."""
         if self._tran.requires_grad: yield self._tran
         if self._emis.requires_grad: yield self._emis
 
     def get_transition(self):
-        """Gets transition matrix."""
+        """Get transition matrix."""
         return _construct_prob_mat(self._tran, self._n_states)
 
     def get_emission(self):
-        """Gets emission parameters.
+        """Get emission parameters.
 
         If the emission distribution is discrete, returns the emission matrix;
         otherwise returns a matrix whose :math:`k`-th row contains parameters
@@ -113,15 +114,15 @@ class AutogradHmm(object):
         return self._emis.view(self._n_states, -1)
 
     def get_normalized_forward(self):
-        """Gets normalized forward probabilities (filtering)."""
+        """Get normalized forward probabilities (filtering)."""
         return self._forward
 
     def get_normalizing_constant(self):
-        """Gets normalizing constants of forward quantities."""
+        """Get normalizing constants of forward quantities."""
         return self._const
 
     def write_transition(self, tran, requires_grad=False):
-        """Writes transition parameters of the model.
+        """Write transition parameters of the model.
 
         Parameters
         ----------
@@ -137,7 +138,7 @@ class AutogradHmm(object):
         self._tran.requires_grad = requires_grad
 
     def write_emission(self, emis, discrete, requires_grad=False):
-        """Writes emission parameters of the model.
+        """Write emission parameters of the model.
 
         Parameters
         ----------
@@ -159,7 +160,7 @@ class AutogradHmm(object):
         self._is_discrete = discrete
 
     def setup(self, tran, emis, discrete, true_train=False, true_emis=False):
-        """Sets up the model.
+        """Set up the model.
 
         This method constructs the HMM based on the transition parameters and
         emission parameters provided. You should indicate if they are true
@@ -188,7 +189,7 @@ class AutogradHmm(object):
         self.write_emission(emis, discrete, not true_emis)
 
     def gradients(self):
-        """Gets gradients of model parameters.
+        """Get gradients of model parameters.
 
         Returns an 1D ``Tensor`` contains the gradient of parameters.
         """
@@ -200,7 +201,7 @@ class AutogradHmm(object):
         return torch.cat(grads)
 
     def loglike_emission(self, obs, states):
-        """Computes log-likelihood for the emission distribution.
+        """Compute log-likelihood for the emission distribution.
 
         Should be overridden by all subclasses. Use the method ``get_emission``
         to get emission parameters.
@@ -217,7 +218,7 @@ class AutogradHmm(object):
         raise NotImplementedError
 
     def information_emission(self, obs, states):
-        """Computes score and information for the emission distribution.
+        """Compute score and information for the emission distribution.
 
         Parameters
         ----------
@@ -250,7 +251,7 @@ class AutogradHmm(object):
         return score.detach(), information.detach()
 
     def filtering(self, obs):
-        """Performs normalized forward algorithm (filtering).
+        """Perform normalized forward algorithm (filtering).
 
         This method implements the normalized forward algorithm for
         observations provided and stores the forward probabilities and
@@ -284,14 +285,14 @@ class AutogradHmm(object):
         self._const = c
 
     def zero_grad(self):
-        """Sets gradients of the model to zero."""
+        """Set gradients of the model to zero."""
         if self._tran.grad is not None:
             self._tran.grad.data.zero_()
         if self._emis.grad is not None:
             self._emis.grad.data.zero_()
 
     def log_likelihood(self, obs, filtered=False):
-        """Computes log-likelihood.
+        """Compute log-likelihood.
 
         Parameters
         ----------
@@ -305,7 +306,7 @@ class AutogradHmm(object):
         return torch.sum(torch.log(self._const))
 
     def information(self, obs, filtered=False):
-        """Computes score and information matrix.
+        """Compute score and information matrix.
 
         Parameters
         ----------
@@ -322,7 +323,7 @@ class AutogradHmm(object):
         return score, info
 
     def compute_stats(self, obs, alpha=0.05, idx=None, prange=None, trange=None, stat_type='autograd'):
-        """Computes test statistics.
+        """Compute test statistics.
 
         This function performs score-based hypothesis tests to detect the existence of a change in a hidden Markov model as it learns from
         a continuous, possibly evolving, stream of data.
@@ -378,16 +379,18 @@ class AutogradHmm(object):
 
         n = len(obs)
         alpha, idx, prange, trange = _exceptions_handling(n, self._par_length(),
-            alpha, 0, idx, prange, trange, stat_type)
-        # computes the inverse of information matrix once
+                                                          alpha, 0, idx, prange,
+                                                          trange, stat_type)
+        # compute the inverse of information matrix once
         ident = torch.eye(self._par_length())
         self.filtering(obs)
         score, info = self.information(obs, True)
         Iinv = _compute_inv(ident, info)
-        # computes thresholds once
-        thresh = compute_thresholds(len(idx), max([1, max(trange) - min(trange)]),
-            alpha, prange, stat_type)
-        # computes test statistic
+        # compute thresholds once
+        thresh = compute_thresholds(len(idx),
+                                    max([1, max(trange) - min(trange)]),
+                                    alpha, prange, stat_type)
+        # compute test statistic
         stat = torch.zeros(3)
         tau = np.array([0, 0, 0])
         index = [idx, np.arange(max(prange)), idx]
@@ -395,19 +398,20 @@ class AutogradHmm(object):
             if lo == 0:
                 tau1, tau2, tau3 = self._recursive_smoother(obs[:hi])
             else:
-                tau1, tau2, tau3 = self._smoother_interval(obs[lo:hi], lo,\
-                    hi, tau1, tau2, tau3)
+                tau1, tau2, tau3 = self._smoother_interval(obs[lo:hi], lo, hi,
+                                                           tau1, tau2, tau3)
             temp = torch.sum(tau1, 0)
             cond_score = score - temp  # conditional score
             temp = torch.ger(temp, temp) + torch.sum(tau2 - tau3, 0)
             cond_info = info - temp  # conditional information
             new_stat, new_index = _compute_stats(prange, idx, cond_score,
-                cond_info, Iinv, thresh, stat_type)
+                                                 cond_info, Iinv, thresh,
+                                                 stat_type)
             stat, index, tau = _update_res(new_stat, stat, new_index, index, hi, tau)
         return _return_results(stat, index, tau, stat_type)
 
     def _par_length(self):
-        """Gets length of parameter vector."""
+        """Get length of parameter vector."""
         lpar = 0
         if self._emis.requires_grad:
             lpar += len(self._emis)
@@ -416,7 +420,7 @@ class AutogradHmm(object):
         return lpar
 
     def _emission_dist(self, obs):
-        """Computes emission distribution of observations conditioning on each state."""
+        """Compute emission distribution of observations conditioning on each state."""
         n = len(obs)
         n_states = self._n_states
         g = torch.zeros((n, n_states))
@@ -426,7 +430,7 @@ class AutogradHmm(object):
         return g.detach()
 
     def _init_smoother(self, obs, phi):
-        """Computes initial smoother.
+        """Compute initial smoother.
         """
 
         n_states = self._n_states
@@ -442,7 +446,7 @@ class AutogradHmm(object):
         return tau1, tau2, tau3
 
     def _next_smoother(self, obs, k, tau1, tau2, tau3):
-        """Computes next smoother.
+        """Compute next smoother.
 
         Parameters
         ----------
@@ -481,27 +485,24 @@ class AutogradHmm(object):
 
         for j in range(n_states):
             new1[j] = (q[:, j] @ tau1 + (phi * q[:, j]) @ s1[:, j]) * g[j] / c
-            new2[j] = torch.sum(q[:, j][:, np.newaxis, np.newaxis] * tau2, 0)\
-                * g[j] / c
-            new2[j] += torch.sum((phi * q[:, j])[:, np.newaxis, np.newaxis]
-                                 * s2[:, j], 0) * g[j] / c
+            new2[j] = torch.sum(q[:, j][:, np.newaxis, np.newaxis] * tau2, 0) * g[j] / c
+            new2[j] += torch.sum((phi * q[:, j])[:, np.newaxis, np.newaxis] * s2[:, j], 0) * g[j] / c
             for i in range(n_states):
                 sxtau = torch.ger(s1[i, j, :], tau1[i])
                 s1xs1 = torch.ger(s1[i, j, :], s1[i, j, :])
-                new3[j] += (tau3[i] + sxtau.transpose(0, 1) + sxtau + phi[i]
-                            * s1xs1) * q[i, j] * g[j]
+                new3[j] += (tau3[i] + sxtau.transpose(0, 1) + sxtau + phi[i] * s1xs1) * q[i, j] * g[j]
             new3[j] /= c
         return new1, new2, new3
 
     def _smoother_interval(self, obs, lo, hi, tau1, tau2, tau3):
-        """Computes smoother within an interval."""
+        """Compute smoother within an interval."""
         new1, new2, new3 = tau1, tau2, tau3
         for i, t in enumerate(range(lo, hi)):
             new1, new2, new3 = self._next_smoother(obs[i], t, new1, new2, new3)
         return new1, new2, new3
 
     def _recursive_smoother(self, obs):
-        """Computes recursive smoother associated with score and information.
+        """Compute recursive smoother associated with score and information.
 
         Run the method ``filtering`` first.
         """

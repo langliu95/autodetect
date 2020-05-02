@@ -1,6 +1,6 @@
 """Functions for preprocessing text data.
 
-Download the dataset before run this script.
+Download the dataset (see run_tv_shows.sh) before run this script.
 
 Author: Lang Liu
 Date: 06/10/2019
@@ -18,7 +18,11 @@ from nltk.tag.stanford import StanfordNERTagger
 import pysrt
 
 
+##########################################################################
 # files I/O
+##########################################################################
+
+
 def _read_lines(path):
     with open(path, 'r') as f:
         out = f.readlines()
@@ -26,54 +30,65 @@ def _read_lines(path):
     out = [x.strip() for x in out]
     return out
 
+
 def _save_lines(text, path):
     with open(path, 'w+') as f:
         for item in text:
             f.write(f"{item}\n")
 
+
+##########################################################################
 # normalization
-# -----------------------------------------------------------------------------
+##########################################################################
+
+
 def strip_html(text):
-    """Removes HTML marks."""
+    """Remove HTML marks."""
     text = text.replace("<i>", '')
     text = text.replace("</i>", '')
     return text
 
+
 def replace_contractions(text):
-    """Replaces contractions in the text."""
+    """Replace contractions in the text."""
     text = text.replace("ain't", 'are not')
     text = text.replace("in'", 'ing')
     text = text.replace("\'cause", "because")
     return contractions.fix(text)
 
+
 def remove_non_ascii(text):
     """Remove non-ASCII characters in the text."""
-    new_text = unicodedata.normalize('NFKD', text).encode('ascii', 'ignore').\
-        decode('utf-8', 'ignore')
+    new_text = unicodedata.normalize('NFKD', text).encode('ascii', 'ignore').decode('utf-8', 'ignore')
     return new_text
 
-# def to_lowercase(text):
-#     return text.lower()
 
 def remove_punctuation(text):
     return re.sub(r'[^\w\s]', '', text)
 
+
+##########################################################################
 # the following functions need to be called after tokenization
 # perform to_lowercase() first
+##########################################################################
+
+
 def remove_stopwords(words):
     stop_words = _read_lines('stopwords.txt')
     return [word for word in words if word not in stop_words]
 
+
 def _convert_ordinal_num(word):
-    """Converts ordinal numbers to cardinal numbers."""
+    """Convert ordinal numbers to cardinal numbers."""
     ths = re.findall(r'\d+st|\d+nd|\d+rd|\d+th', word)  # find -st, -nd, -rd, -th
     for th in ths:
         num = th[:(len(th) - 2)]
         word = re.sub(th, num, word)
     return word
 
+
 def _my_num_to_words(word):
-    """Converts numbers to their words equivalent."""
+    """Convert numbers to their words equivalent."""
     p = inflect.engine()
     nums = p.number_to_words(word)
     nums = nums.replace('-', ' ')
@@ -82,8 +97,9 @@ def _my_num_to_words(word):
     nums = remove_stopwords(nums)
     return nums
 
+
 def replace_numbers(words):
-    """Replaces numbers with their words equivalent."""
+    """Replace numbers with their words equivalent."""
     new_words = []
     for word in words:
         if word.isdigit():  # '123'
@@ -91,7 +107,7 @@ def replace_numbers(words):
             new_words += nums
         elif word[0].isdigit():  # '24inches'
             word = _convert_ordinal_num(word)
-            seps = re.split(r'(\d+)', word)  # TODO: add r before ''
+            seps = re.split(r'(\d+)', word)
             for s in seps:
                 if s.isdigit():
                     nums = _my_num_to_words(s)
@@ -102,13 +118,15 @@ def replace_numbers(words):
             new_words.append(word)
     return new_words
 
+
 def remove_numbers(words):
-    return [re.sub(r'\d+', '', word) for word in words if not word[0].isdigit()
-        and not word[-1].isdigit()]
+    return [re.sub(r'\d+', '', word) for word in words if not word[0].isdigit() and not word[-1].isdigit()]
+
 
 def lemmatize_verbs(words):
     lemmatizer = WordNetLemmatizer()
     return [lemmatizer.lemmatize(word, pos='v') for word in words]
+
 
 def remove_names(words):
     st = StanfordNERTagger('stanford-ner/english.all.3class.distsim.crf.ser.gz', 'stanford-ner/stanford-ner.jar')
@@ -116,14 +134,18 @@ def remove_names(words):
     new_words = [word for (word, tag) in tags if tag != 'PERSON']
     return new_words
 
+
 def to_lowercase(words):
     return [word.lower() for word in words]
 
 
+##########################################################################
 # preprocessing
-# -----------------------------------------------------------------------------
+##########################################################################
+
+
 def preprocess(text):
-    """Preprocesses text data.
+    """Preprocesse text data.
 
     Including removing HTML marks, replacing contractions with their original
     forms, removing non-ASCII characters, removing punctuations, tokenizing text
@@ -133,7 +155,6 @@ def preprocess(text):
     text = strip_html(text)
     text = replace_contractions(text)
     text = remove_non_ascii(text)
-    #text = to_lowercase(text)
     text = text.replace('-', ' ')
     text = remove_punctuation(text)
     words = nltk.word_tokenize(text)  # tokenization
@@ -143,6 +164,7 @@ def preprocess(text):
     words = remove_stopwords(words)
     words = lemmatize_verbs(words)
     return words
+
 
 if __name__ == '__main__':
     read_path = 'tv_subtitles'
@@ -154,7 +176,7 @@ if __name__ == '__main__':
 
     print("preprocessing")
     for s in [1, 2]:
-        print(f"Season {s}")
+        print("Season {}".format(s))
         season = []
         print("friends")
         for e in range(1, 25):

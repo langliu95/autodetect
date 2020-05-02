@@ -10,10 +10,8 @@ import copy
 import numpy as np
 
 import torch
-from torch.autograd import grad
 
 from .utils import _compute_culinear_stat
-from .utils import _max_score
 
 
 class AutogradCuSum(object):
@@ -86,7 +84,7 @@ class AutogradCuSum(object):
         self._initialization()
 
     def model_parameters(self):
-        """Gets model parameters.
+        """Get model parameters.
         """
         pars = []
         for par in self._model.parameters():
@@ -95,12 +93,12 @@ class AutogradCuSum(object):
         return torch.cat(pars).detach()
 
     def log_likelihood(self, inputs, targets):
-        """Computes log-likelihood."""
+        """Compute log-likelihood."""
         outputs = self._model(inputs).view(-1)
         return self._loglike(outputs, targets)
 
     def gradients(self):
-        """Gets gradients of model parameters.
+        """Get gradients of model parameters.
 
         Returns a 1D ``Tensor`` contains the derivatives of each parameters in
         the parameter vector.
@@ -140,7 +138,7 @@ class AutogradCuSum(object):
             self._size += 1
 
     def _update_model(self, inputs, targets):
-        """Updates model given new (inputs, targets).
+        """Update model given new (inputs, targets).
 
         This method takes one step update of Adam using new (inputs, targets).
         """
@@ -151,7 +149,7 @@ class AutogradCuSum(object):
         optim.step()
 
     def update_information(self, inputs, targets):
-        """Computes score function and information matrix (first derivatives).
+        """Compute score function and information matrix (first derivatives).
 
         .. note::
             This function will set gradients of the model to zero.
@@ -179,7 +177,7 @@ class AutogradCuSum(object):
             self._size += 1
 
     def compute_stats(self, inputs, targets, thresh, min_thresh=0.0, idx=None):
-        """Computes statistics given new (inputs, targets).
+        """Compute statistics given new (inputs, targets).
 
         Currently only the linear statistic is supported.
 
@@ -201,7 +199,9 @@ class AutogradCuSum(object):
             idx = range(self._dim)
         self.update_information(inputs, targets)
 
-        stat = _compute_culinear_stat(self._full_score[idx], self._full_info[np.ix_(idx, idx)], thresh)
+        stat = _compute_culinear_stat(self._full_score[idx],
+                                      self._full_info[np.ix_(idx, idx)],
+                                      thresh)
         if self._min_stat >= min_thresh:
             if stat <= self._min_stat:
                 self._min_stat = max(stat, min_thresh)
@@ -213,5 +213,7 @@ class AutogradCuSum(object):
         else:
             self._min_stat = max(stat, min_thresh)
 
-        stat = _compute_culinear_stat(self._score[idx], self._info[np.ix_(idx, idx)], thresh)
+        stat = _compute_culinear_stat(self._score[idx],
+                                      self._info[np.ix_(idx, idx)],
+                                      thresh)
         return stat * self._size / self._rest_size

@@ -227,8 +227,9 @@ class Generator(object):
         phi: numpy.ndarray, shape (p,)
             AR parameters.
         delta: numpy.ndarray, shape (p,)
-            Value of change in emission parameters.
+            Value of change in AR parameters.
         theta: numpy.ndarray, shape (q,)
+            MA parameters.
 
         Returns
         -------

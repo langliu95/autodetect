@@ -15,7 +15,7 @@ from pomegranate import NormalDistribution
 from statsmodels.tsa.arima_model import ARMA
 import torch
 
-sys.path.append("..") # Adds higher directory to python modules path.
+sys.path.append("..")  # Adds higher directory to python modules path.
 from autodetect.data import Generator
 
 
@@ -23,8 +23,9 @@ from autodetect.data import Generator
 # functions for generating parameters
 ##########################################################################
 
+
 def prob_matrix(n, m, alpha=None):
-    """Generates a probability matrix.
+    """Generate a probability matrix.
 
     This function generates a probability matrix whose each row has a Dirichlet
     distribution.
@@ -51,7 +52,7 @@ def prob_matrix(n, m, alpha=None):
 
 
 def change_for_prob_vec(vec, p):
-    """Generates change for probability vector.
+    """Generate change for probability vector.
 
     The number of positive changes is equal to the one of negative changes, or
     their difference is one.
@@ -71,12 +72,12 @@ def change_for_prob_vec(vec, p):
     if pos_num > 0:
         delta[order[:pos_num]] = 1.0
         delta[order[-neg_num:]] = -1.0
-        maximum = min(1 - vec[order[pos_num-1]], vec[order[-neg_num]])
+        maximum = min(1 - vec[order[pos_num - 1]], vec[order[-neg_num]])
     else:
         maximum = 1.0
-    # decides the last change
+    # decide the last change
     if p > 2 * pos_num:
-        if vec[order[-(neg_num+1)]] >= vec[-1]:
+        if vec[order[-(neg_num + 1)]] >= vec[-1]:
             neg_num += 1
             delta[-1] = 1.0
             delta[order[-neg_num]] = -1.0
@@ -90,7 +91,7 @@ def change_for_prob_vec(vec, p):
 
 
 def change_for_prob_matrix(prob_mat, p):
-    """Generates change for probability matrix.
+    """Generate change for probability matrix.
 
     Components of change are as even as possible across rows. Given a row, the
     number of positive changes is equal to the one of negative changes, or
@@ -101,7 +102,7 @@ def change_for_prob_matrix(prob_mat, p):
     prob_mat: array-like, shape (d, d)
         Probability matrix in which the change is generated.
     p: int
-        Number of changed components. Must smaller than :math:`d(d-1)`.
+        Number of changed components. Must be smaller than :math:`d(d-1)`.
     """
 
     d, c = prob_mat.shape
@@ -120,7 +121,7 @@ def change_for_prob_matrix(prob_mat, p):
 
 
 def change_for_brown_keep_zero(prob_mat, p):
-    """Generates change for probability matrix in Brown model.
+    """Generate change for probability matrix in Brown model.
 
     This function does not impose changes in component that is zero.
     Components of change are as even as possible across rows.
@@ -130,7 +131,7 @@ def change_for_brown_keep_zero(prob_mat, p):
     prob_mat: array-like, shape (d, d)
         Probability matrix in which the change is generated.
     p: int
-        Number of changed components. Must smaller than :math:`d(d-1)`.
+        Number of changed components. Must be smaller than :math:`d(d-1)`.
     """
 
     d, c = prob_mat.shape
@@ -152,7 +153,7 @@ def change_for_brown_keep_zero(prob_mat, p):
 
 
 def pars_for_hmm(n, c, p_tran, p_emis, emission="Normal", alpha=None):
-    """Generates parameters for HMM.
+    """Generate parameters for HMM.
 
     This function generates the transition matrix and emission matrix by
     using Dirichlet distribution.
@@ -187,7 +188,7 @@ def pars_for_hmm(n, c, p_tran, p_emis, emission="Normal", alpha=None):
 
 
 def pars_for_brown(n, c, p_tran, p_emis, alpha=None):
-    """Generates parameters for Brown model.
+    """Generate parameters for Brown model.
 
     This function generates the transition matrix and emission matrix by
     using Dirichlet distribution.
@@ -221,7 +222,7 @@ def pars_for_brown(n, c, p_tran, p_emis, alpha=None):
             num = min_state + 1
         else:
             num = min_state
-        asign_states[lo:(lo+num)] = s
+        asign_states[lo:(lo + num)] = s
         lo = lo + num
     npr.shuffle(asign_states)
     for s in range(n):
@@ -235,7 +236,7 @@ def pars_for_brown(n, c, p_tran, p_emis, alpha=None):
 
 
 def pars_for_arma(p, q, seed):
-    """Generates parameters for ARMA model."""
+    """Generate parameters for ARMA model."""
     npr.seed(seed)
     ar_root = np.random.exponential(0.5, p) + 1.0
     ar_root *= np.random.choice([-1, 1], p)
@@ -249,7 +250,7 @@ def pars_for_arma(p, q, seed):
 
 
 def change_for_ar(phi, ar_root, r):
-    """Generates change for AR model."""
+    """Generate change for AR model."""
     ar_new_root = (1 + r) * ar_root
     phi_new = np.polynomial.polynomial.polyfromroots(ar_new_root)
     phi_new /= -phi_new[0]
@@ -259,7 +260,7 @@ def change_for_ar(phi, ar_root, r):
 
 
 def change_for_ma(the, ma_root, r):
-    """Generates change for MA model."""
+    """Generate change for MA model."""
     ma_new_root = ma_root + r * ma_root
     the_new = np.polynomial.polynomial.polyfromroots(ma_new_root)
     the_new /= the_new[0]
@@ -267,12 +268,14 @@ def change_for_ma(the, ma_root, r):
     de = np.sqrt(np.sum(delta**2)) / np.sqrt(len(the))
     return delta, de
 
+
 ##########################################################################
 # functions for generating data
 ##########################################################################
 
+
 def load_parameters(file_name):
-    """Loads parameters for HMM and Brown"""
+    """Load parameters for HMM and Brown"""
     with open(file_name) as f:
         pars = f.readlines()
 
@@ -293,7 +296,7 @@ def load_parameters(file_name):
     loc += 1
 
     # emission parameters
-    p, q = int(pars[loc]), int(pars[loc+1])
+    p, q = int(pars[loc]), int(pars[loc + 1])
     emis = np.zeros((p, q))
     delta_emis = np.zeros((p, q))
     loc += 2
@@ -310,36 +313,91 @@ def load_parameters(file_name):
 
 
 def synthetic_data_hmm(n, dim, tau, tran, delta, emis, model, obs_per_state, seed):
-    """Generates synthetic data for HMMs.
+    """Generate synthetic data for HMM with change in emission parameters.
 
-    model: "Normal" or "Discrete"
+    Parameters
+    ----------
+    n: int
+        Sample size.
+    dim: int
+        Dimension of observations.
+    tau: int
+        Location of the changepoint.
+    tran: numpy.ndarray, shape (n_states, n_states)
+        Transition matrix.
+    delta: numpy.ndarray, shape (n_states, n_states)
+        Value of change in transition matrix.
+    emis: array-like, shape (n_states, n_emissions or n_pars)
+        Emission parameters.
+        For discrete emission distribution, it is the emission matrix;
+        for normal distribution, it is the normal parameters.
+    model: str
+        Model of emission distribution. Must be ``"Normal"`` or ``"Discrete"``.
+    obs_per_state: int
+        For each state must appear at least this number times in the generated data.
+    seed: str
+        Random seed.
+
+    Returns
+    -------
+    states: numpy.ndarray, shape (n,)
+        Hidden states associated with observations.
+    obs: numpy.ndarray, shape (n,)
+        Generated observations.
     """
 
     N = len(tran)
     n_cats = emis.shape[1]
-    # generates data with change in transition parameters
+    # generate data with change in transition parameters
     nu = np.ones(N) / N
     gen = Generator(n, dim, tau)
 
     np.random.seed(seed)
     bad = True
     while bad:
-        x, y = gen.hmm_transition(tran, delta, emis, model, nu)
+        states, obs = gen.hmm_transition(tran, delta, emis, model, nu)
         bad = False
         for state in range(N):
-            if np.sum(x == state) < obs_per_state:
+            if np.sum(states == state) < obs_per_state:
                 bad = True
                 break
         if model == 'Discrete':
             for cat in range(n_cats):
-                if np.sum(y == cat) < obs_per_state:
+                if np.sum(obs == cat) < obs_per_state:
                     bad = True
                     break
-    return x, y
+    return states, obs
 
 
 def synthetic_data_arma(n, dim, tau, phi, delta, the, seed):
-    """Generates synthetic data for ARMA models."""
+    """Generate synthetic data for ARMA with change in AR parameters.
+
+    Parameters
+    ----------
+    n: int
+        Sample size.
+    dim: int
+        Dimension of observations.
+    tau: int
+        Location of the changepoint.
+    phi: numpy.ndarray, shape (p,)
+        AR parameters.
+    delta: numpy.ndarray, shape (p,)
+        Value of change in AR parameters.
+    the: numpy.ndarray, shape (q,)
+        MA parameters.
+    seed: str
+        Random seed.
+
+    Returns
+    -------
+    obs: torch.Tensor, shape (n,)
+        Generated observations.
+    theta_hat: torch.Tensor, shape (p+q,)
+        Estimated parameters.
+    sigma2: float
+        Estimated variance of the error term.
+    """
     p, q = len(phi), len(the)
     gen = Generator(n, dim, tau)
     np.random.seed(seed)
@@ -354,22 +412,24 @@ def synthetic_data_arma(n, dim, tau, phi, delta, the, seed):
     obs = torch.from_numpy(np.column_stack([y, np.zeros(n)])).float()
     theta_hat = torch.tensor(cmle.params).float()
     theta_hat.requires_grad = True
-    return obs, theta_hat, cmle.sigma2
+    sigma2 = cmle.sigma2
+    return obs, theta_hat, sigma2
 
 
 ##########################################################################
 # miscellaneous
 ##########################################################################
 
+
 def write_mat(matrix, f):
-    """Writes matrix to file."""
+    """Write matrix to file."""
     for _, mat in enumerate(matrix):
         for v in mat:
             f.write("%s\n" % str(v))
 
 
 def hmm_mle(y, N):
-    """Computes the MLE of normal HMMs."""
+    """Compute the MLE of normal HMMs."""
     model = HiddenMarkovModel()
     model = model.from_samples(NormalDistribution, N, [y])
     tran = model.dense_transition_matrix()[:N, :N]
@@ -384,8 +444,10 @@ def hmm_mle(y, N):
 def check_rejection(stat, type_stat=''):
     """Check rejection given the statistic."""
     rej = 0
-    if stat > 1: rej = 1
-    if stat == 1: print(f"{type_stat}non-invertible rejection.")
+    if stat > 1:
+        rej = 1
+    if stat == 1:
+        print("{}non-invertible rejection.".format(type_stat))
     return rej
 
 

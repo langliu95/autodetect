@@ -60,8 +60,6 @@ def run_arma(rep, n, tau0, P, Q, num, seed, postfix=''):
 
     # decides parameters
     dim = 1
-    #seed = 11919  # for ARMA(3,2)
-    #seed = 11519  # for ARMA(6,5)
     lag = max(P, Q)
     phi, the, ar_root, _ = pars_for_arma(P, Q, seed)
 
@@ -113,7 +111,7 @@ def run_brown(rep, n, tau0, n_states, num, postfix=''):
         delta = de * delta_tran
         seed = s + num * rep
         x, y = synthetic_data_hmm(n, 1, tau0, tran0, delta, emis0,
-                                      'Discrete', 80, seed)
+                                  'Discrete', 80, seed)
         print('Finished generating data')
         # train the model
         model = AutogradTopic(n_cats, n_states)
@@ -172,7 +170,7 @@ def run_hmm(rep, n, tau0, n_states, num, single=False, postfix=''):
         delta = de * delta_tran
         if not single: seed = s + num * rep
         x, y = synthetic_data_hmm(n, 1, tau0, tran0, delta, emis0,
-                                      'Normal', 80, seed)
+                                  'Normal', 80, seed)
         print('Finished generating data')
         # computes mle
         tran, emis = hmm_mle(y, n_states)
