@@ -132,8 +132,8 @@ class AutogradTopic():
         Parameters
         ----------
         obs: array-like, 1D
-            Integer sequence of observations, where :math:`0,\\dots,` ``num_cat``-1
-            are used to represent ``num_cat`` different categories.
+            Integer sequence of observations taking values from 0 to
+            ``num_cat - 1``.
         transform: function, optional
             Transformation method performed on the frequency of pairs of
             adjacent observations and the frequency of observations. Default
@@ -177,8 +177,8 @@ class AutogradTopic():
         Parameters
         ----------
         obs: array-like, 1D
-            Integer sequence of observations, where :math:`0,\\dots,` ``num_cat``-1
-            are used to represent ``num_cat`` different categories.
+            Integer sequence of observations taking values from 0 to
+            ``num_cat - 1``.
         embed: array-like, 1D
             Embedding scheme from categories to hidden states.
 
@@ -213,8 +213,8 @@ class AutogradTopic():
         Parameters
         ----------
         obs: array-like, 1D
-            Integer sequence of observations, where :math:`0,\\dots,` ``num_cat``-1
-            are used to represent ``num_cat`` different categories.
+            Integer sequence of observations taking values from 0 to
+            ``num_cat - 1``.
         transform: function, optional
             Transformation method performed on the frequency of pairs of
             adjacent observations and the frequency of observations. Default
@@ -253,8 +253,8 @@ class AutogradTopic():
         Parameters
         ----------
         obs: array-like, 1D
-            Integer sequence of observations, where :math:`0,\\dots,` ``num_cat``-1
-            are used to represent ``num_cat`` different categories.
+            Integer sequence of observations taking values from 0 to
+            ``num_cat - 1``.
         freq_cats: array-like, shape (num_cat,), optional
             Category frequency in observations. Default is None.
         freq_pairs: array-like, shape (num_hid, num_hid), optional

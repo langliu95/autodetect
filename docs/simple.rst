@@ -102,7 +102,7 @@ log-likelihood function (up to a constant).
             return inputs
 
     def loglike(outs, targets):
-        loss_fn = nn.MSELoss(size_average=False)
+        loss_fn = nn.MSELoss(reduction='sum')
         return -loss_fn(outs, targets) / 2
 
 We then train the model with the loss function being negative log-likelihood.
@@ -134,7 +134,7 @@ detection to coefficients:
     stat, tau, index = lin_autograd.compute_stats(inputs, targets, idx=range(d))
 
 .. note::
-    Since coefficients come first in ``linear.parameters()``, the indices for coefficients are :math:`0, \ldots, d-1`.
+    Since slope coefficients come first in ``linear.parameters()``, the indices for slope coefficients are :math:`0, \dots, d-1`.
 
 API reference
 -------------

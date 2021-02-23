@@ -165,7 +165,7 @@ def _compute_inv(ident, info, const=0.0):
     """Compute inverse of observed information."""
     while True:
         try:
-            Iinv, _ = torch.gesv(ident, info + const * ident)
+            Iinv, _ = torch.solve(ident, info + const * ident)
             break
         except RuntimeError:
             print("Observed information matrix is ill conditioned.")
@@ -198,18 +198,18 @@ def _max_score(p, order, score, Ischur):
     """
 
     index = order[-p:]
-    sub_score = score[index]  # TODO: might need to add .view(-1)
+    sub_score = score[index]
     sub_Ischur = Ischur[np.ix_(index, index)]
     try:
         if type(score).__module__ == 'numpy':
             inv = np.linalg.solve(sub_Ischur, sub_score)
         else:
-            inv, _ = torch.gesv(sub_score, sub_Ischur)
+            inv, _ = torch.solve(sub_score.view(-1, 1), sub_Ischur)
         stat = sub_score @ inv
     except (RuntimeError, np.linalg.LinAlgError) as _:
         # print("Conditional information matrix is not invertible.")
         # print("Adding a scalar matrix for an approximation.")
-        # inv, _ = torch.gesv(sub_score, sub_Ischur + 0.1*torch.eye(p))
+        # inv, _ = torch.solve(sub_score.view(-1, 1), sub_Ischur + 0.1*torch.eye(p))
         stat = False  # if sub_Ischur is ill-conditioned, set the stat to False
     return stat, index
 
@@ -307,10 +307,10 @@ def _compute_culinear_stat(score, info, thresh):
         if type(score).__module__ == 'numpy':
             inv = np.linalg.solve(info, score)
         else:
-            inv, _ = torch.gesv(score, info)
+            inv, _ = torch.solve(score.view(-1, 1), info)
         return score @ inv / thresh
     except (RuntimeError, np.linalg.LinAlgError) as _:
-        #inv, _ = torch.gesv(sub_score, sub_info + 0.1 * torch.eye(self._dim))
+        #inv, _ = torch.solve(sub_score.view(-1, 1), sub_info + 0.1 * torch.eye(self._dim))
         return 0.0
 
 

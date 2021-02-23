@@ -319,7 +319,7 @@ class AutogradHmm(object):
             self.filtering(obs)
         tau1, tau2, tau3 = self._recursive_smoother(obs)
         score = torch.sum(tau1, 0)
-        info = torch.ger(score, score) + torch.sum(tau2 - tau3, 0)
+        info = torch.outer(score, score) + torch.sum(tau2 - tau3, 0)
         return score, info
 
     def compute_stats(self, obs, alpha=0.05, idx=None, prange=None, trange=None, stat_type='autograd'):
@@ -402,7 +402,7 @@ class AutogradHmm(object):
                                                            tau1, tau2, tau3)
             temp = torch.sum(tau1, 0)
             cond_score = score - temp  # conditional score
-            temp = torch.ger(temp, temp) + torch.sum(tau2 - tau3, 0)
+            temp = torch.outer(temp, temp) + torch.sum(tau2 - tau3, 0)
             cond_info = info - temp  # conditional information
             new_stat, new_index = _compute_stats(prange, idx, cond_score,
                                                  cond_info, Iinv, thresh,
@@ -440,7 +440,7 @@ class AutogradHmm(object):
         tau3 = torch.zeros((n_states, lpar, lpar))
         for j in range(n_states):
             tau1[j], tau2[j] = self.information_emission(obs, j)
-            tau3[j] = torch.ger(tau1[j], tau1[j]) * phi[j]
+            tau3[j] = torch.outer(tau1[j], tau1[j]) * phi[j]
             tau1[j] = tau1[j] * phi[j]
             tau2[j] = tau2[j] * phi[j]
         return tau1, tau2, tau3
@@ -488,8 +488,8 @@ class AutogradHmm(object):
             new2[j] = torch.sum(q[:, j][:, np.newaxis, np.newaxis] * tau2, 0) * g[j] / c
             new2[j] += torch.sum((phi * q[:, j])[:, np.newaxis, np.newaxis] * s2[:, j], 0) * g[j] / c
             for i in range(n_states):
-                sxtau = torch.ger(s1[i, j, :], tau1[i])
-                s1xs1 = torch.ger(s1[i, j, :], s1[i, j, :])
+                sxtau = torch.outer(s1[i, j, :], tau1[i])
+                s1xs1 = torch.outer(s1[i, j, :], s1[i, j, :])
                 new3[j] += (tau3[i] + sxtau.transpose(0, 1) + sxtau + phi[i] * s1xs1) * q[i, j] * g[j]
             new3[j] /= c
         return new1, new2, new3

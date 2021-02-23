@@ -29,7 +29,7 @@ def _score_information(theta, obs, loglike):
         like = loglike(theta, ob.view(1, -1))
         temp = grad(like, theta)[0]
         score += temp
-        info += torch.ger(temp, temp)
+        info += torch.outer(temp, temp)
     return score.detach(), info.detach()
 
 
@@ -239,7 +239,7 @@ def autograd_arma(theta, sig2, obs, p, q, alpha=0.05, idx=None, prange=None, tra
     linear statistic is the maximum score statistic over all possible locations of
     change. The scan statistic is the maximum score statistic over all possible
     locations of change, and over all possible subsets of parameters in which change
-    occurs (for more details see). TODO: add reference.
+    occurs.
 
     Parameters
     ----------

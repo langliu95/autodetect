@@ -38,41 +38,6 @@ class AutogradCuSum(object):
     loglike: function
         ``loglike(outputs, targets)`` is the log-likelihood of model parameters
         given ``outputs`` and ``targets``.
-
-    Example
-    -------
-    >>> import math
-    >>> import torch
-    >>> import torch.nn as nn
-    >>>
-    >>> # generates inputs
-    >>> n, d = 1000, 4
-    >>> tau = int(n / 2)
-    >>> inputs = torch.randn((n, d))
-    >>> theta = torch.ones(d)
-    >>> delta = 0.5 * torch.ones(d)
-    >>>
-    >>> # generates targets with change
-    >>> targets = inputs @ theta + 1 + torch.normal(mean=0.0, std=0.1*torch.ones(n))
-    >>> targets[tau:] += inputs[tau:] @ delta
-    >>> targets = targets.view(-1)
-    >>>
-    >>> # trains the linear model
-    >>> linear = Linear(d, 1)
-    >>> def loglike(out, tar):
-    >>>     loss_fn = nn.MSELoss(size_average=False)
-    >>>     return -loss_fn(out, tar) / 2
-    >>> optim = torch.optim.Adam(linear.parameters())
-    >>> for _ in range(10000):
-    >>>     optim.zero_grad()
-    >>>     outs = linear(inputs)
-    >>>     loss = -loglike(outs, targets)
-    >>>     loss.backward()
-    >>>     optim.step()
-    >>>
-    >>> # change point detection
-    >>> auto_cusum = AutogradCuSum(linear, loglike)
-    >>> stat, index, tau = auto_cusum.score_stat(inputs, targets)
     """
 
     def __init__(self, pretrained_model, loglike):
@@ -94,7 +59,7 @@ class AutogradCuSum(object):
 
     def log_likelihood(self, inputs, targets):
         """Compute log-likelihood."""
-        outputs = self._model(inputs).view(-1)
+        outputs = self._model(inputs)
         return self._loglike(outputs, targets)
 
     def gradients(self):
@@ -132,9 +97,9 @@ class AutogradCuSum(object):
             like.backward()
             temp = self.gradients().detach()
             self._score += temp
-            self._info += torch.ger(temp, temp)
+            self._info += torch.outer(temp, temp)
             self._full_score += temp
-            self._full_info += torch.ger(temp, temp)
+            self._full_info += torch.outer(temp, temp)
             self._size += 1
 
     def _update_model(self, inputs, targets):
@@ -171,9 +136,9 @@ class AutogradCuSum(object):
             temp = self.gradients().detach()
             # updates statistics
             self._score += temp
-            self._info += torch.ger(temp, temp)
+            self._info += torch.outer(temp, temp)
             self._full_score += temp
-            self._full_info += torch.ger(temp, temp)
+            self._full_info += torch.outer(temp, temp)
             self._size += 1
 
     def compute_stats(self, inputs, targets, thresh, min_thresh=0.0, idx=None):

@@ -40,7 +40,7 @@ Then we train a linear model using the first ``train_size`` observations.
     from autodetect import AutogradCuSum
     from autodetect.data import Linear
     def loglike(out, tar):
-        loss_fn = nn.MSELoss(size_average=False)
+        loss_fn = nn.MSELoss(reduction='sum')
         return -loss_fn(out, tar) / 2
 
     linear = Linear(dim, 1)
@@ -66,6 +66,7 @@ Next, we run it on the first half sample.
 
 .. code-block:: python
 
+    targets = targets.view(-1, 1)  # reshape targets for autodetect
     size1 = 5000 + train_size  # include train_size
     autocusum.initial_model(inputs[:train_size], targets[:train_size], size1)
     for i in range(train_size, size1):  # feed one obs at a time
