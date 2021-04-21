@@ -58,15 +58,15 @@ Cite
 
 If you use this code, please cite::
 
-    @techreport{lsh2019,
-    title = {Score-based Change Detection for Gradient-based Learning Machines},
-    author = {Liu, Lang and
-              Salmon, Joseph and
-              Harchaoui, Zaid},
-    year = {2019},
-    institution = {Department of Statistics, University of Washington},
-    month = {June}
-    }
+   @inproceedings{lsh2021,
+   title = {Score-Based Change Detection for Gradient-Based Learning Machines},
+   author = {Liu, Lang and
+             Salmon, Joseph and
+             Harchaoui, Zaid},
+   booktitle = {2021 {IEEE} International Conference on Acoustics, Speech and Signal Processing, {ICASSP} 2021, Toronto, Canada, June 6-11, 2021},
+   publisher = {{IEEE}},
+   year = {2021}
+   }
 
 Acknowledgments
 ---------------
