@@ -6,7 +6,8 @@ from .basic import autograd_arma
 from .basic import autograd_test
 from .basic import information
 from .hmm import AutogradHmm
+from .autotest_func import AutogradFunc
 from .topic import AutogradTopic
 
-__all__ = ['autograd_arma', 'autograd_test', 'AutogradTopic',
-    'AutogradCuSum', 'AutogradHmm', 'AutogradTest', 'information']
+__all__ = ['autograd_arma', 'autograd_test', 'AutogradTopic', 'AutogradCuSum',
+           'AutogradFunc', 'AutogradHmm', 'AutogradTest', 'information']

@@ -12,6 +12,61 @@ import numpy as np
 from scipy.special import chdtri
 from scipy.stats import chi2
 import torch
+import torch.nn as nn
+
+
+##########################################################################
+# functions for models
+##########################################################################
+
+def loglike(outs, targets):
+    """Log-likelihood of Gaussian."""
+    loss_fn = nn.MSELoss(reduction='sum')
+    return -loss_fn(outs, targets) / 2
+
+
+def loglike_linear(pars, obs):
+    """Log-likelihood of linear models."""
+    inputs = obs[0]
+    inputs = torch.cat([inputs, torch.ones(len(inputs), 1)], 1)
+    outs = inputs @ pars[0]
+    return loglike(outs, obs[1])
+
+
+def loglike_hmm(pars, obs, init='uniform'):
+    """Log-likelihood of hidden Markov models."""
+    trans = pars[0]
+    last_col = 1 - torch.sum(trans, 1, keepdim=True)
+    trans = torch.cat((trans, last_col), 1)
+    emis = pars[1]
+    obs = obs[0]
+    N = len(trans)
+    
+    def loglike_emission(y):
+        """Gaussian emission."""
+        return -((y - emis[:, 0]) / emis[:, 1])**2 / 2 -\
+            torch.tensor(np.log(2 * math.pi)) / 2 - torch.log(emis[:, 1])
+    
+    if init == 'uniform':
+        init = torch.ones(N) / N
+    if init == 'random':
+        init = torch.rand(N)
+        init = init / torch.sum(init)
+    
+    loglike = torch.zeros(len(obs))
+    g = torch.exp(loglike_emission(obs[0]))
+    c = torch.sum(g * init)
+    phi = init * g / c
+    loglike[0] = torch.log(c)
+    
+    for i, y in enumerate(obs[1:]):
+        g = torch.exp(loglike_emission(y))
+        alpha = phi @ trans * g
+        c = torch.sum(alpha)
+        phi = alpha / c
+        loglike[i+1] = torch.log(c)
+    
+    return torch.sum(loglike)
 
 
 ##########################################################################
@@ -161,6 +216,10 @@ def quantile_max_square_Bessel(q, df, path_size, size, T=1):
 # functions for computing statistics
 ##########################################################################
 
+def _get_batch(obs, lo, hi):
+    """Get a batch of observations."""
+    return [ob[lo:hi] for ob in obs]
+
 def _compute_inv(ident, info, const=0.0):
     """Compute inverse of observed information."""
     while True:
@@ -193,10 +252,7 @@ def _max_score(p, order, score, Ischur):
     -------
     stat: torch.Tensor
         Maximal score statistic (unnormalized). It is ``False`` if the submatrix of ``Ischur`` is ill-conditioned.
-    index: array-like
-        Indices of parameters which attain the maximal statistic.
     """
-
     index = order[-p:]
     sub_score = score[index]
     sub_Ischur = Ischur[np.ix_(index, index)]
@@ -211,7 +267,7 @@ def _max_score(p, order, score, Ischur):
         # print("Adding a scalar matrix for an approximation.")
         # inv, _ = torch.solve(sub_score.view(-1, 1), sub_Ischur + 0.1*torch.eye(p))
         stat = False  # if sub_Ischur is ill-conditioned, set the stat to False
-    return stat, index
+    return stat
 
 
 def _compute_normalized_stat(stat, df, thresh):
@@ -235,7 +291,8 @@ def _compute_normalized_stat(stat, df, thresh):
     return new_stat
 
 
-def _compute_stats(prange, idx, score, info, Iinv, thresh, stat_type='all'):
+def _compute_stats(prange, idx, score, info, Iinv, thresh,
+                   stat_type='all', normalization='schur', finfo=None):
     """Compute statistics for change point detection.
 
     Parameters
@@ -248,8 +305,8 @@ def _compute_stats(prange, idx, score, info, Iinv, thresh, stat_type='all'):
         Conditional score function.
     info : torch.Tensor, shape (dim, dim)
         Conditional observed information.
-    Iinv : torch.Tensor, shape (dim, dim)
-        Inverse of the full observed information.
+    finfo : torch.Tensor, shape (dim, dim)
+        The full observed information or the inverse of it (``'schur'``).
     thresh : list
         Thresholds for the tests, ``[lin, scan, Autograd_lin, Autograd_scan]``.
     stat_type : str, optional
@@ -264,22 +321,45 @@ def _compute_stats(prange, idx, score, info, Iinv, thresh, stat_type='all'):
         stat = torch.zeros(3)  # [linear, scan, score]
         new_stat = torch.zeros(3)
     index = [idx, np.arange(max(prange)), idx]
-    Ischur = info[np.ix_(idx, idx)] - info[idx, :] @ Iinv @ info[:, idx]
 
     # linear statistics
-    new_score, _ = _max_score(0, range(dim), score[idx], Ischur)
+    if normalization == 'schur':
+        Ischur = info[np.ix_(idx, idx)] - info[idx, :] @ Iinv @ info[:, idx]
+        new_score = _max_score(0, range(dim), score[idx], Ischur)
+    else:
+        new_score = _max_score(0, range(dim), score[idx], info[np.ix_(idx, idx)])
+        new_score += _max_score(
+            0, range(dim), score[idx], (finfo - info)[np.ix_(idx, idx)])
     new_stat[0] = _compute_normalized_stat(new_score, dim, thresh[0])
     new_stat[2] = _compute_normalized_stat(new_score, dim, thresh[2])
     if new_stat[0] > stat[0]: stat[0] = new_stat[0]
     if new_stat[2] > stat[2]: stat[2] = new_stat[2]
+
     # scan statistics
     if stat_type != 'linear':
         if type(score).__module__ == 'numpy':
-            order = np.argsort(score[idx]**2  / np.diag(Ischur))
+            if normalization == 'schur':
+                order = np.argsort(score[idx]**2  / np.diag(Ischur))
+            else:
+                stat_diag = score[idx]**2 / np.diag(info)[idx]
+                stat_diag += score[idx]**2 / np.diag(finfo - info)[idx]
+                order = np.argsort(stat_diag)
         else:
-            _, order = torch.sort(score[idx]**2 / torch.diag(Ischur))
+            if normalization == 'schur':
+                _, order = torch.sort(score[idx]**2 / torch.diag(Ischur))
+            else:
+                stat_diag = score[idx]**2 / torch.diag(info)[idx]
+                stat_diag += score[idx]**2 / torch.diag(finfo - info)[idx]
+                _, order = torch.sort(stat_diag)
         for j, p in enumerate(prange):
-            new_score, new_index = _max_score(int(p), order, score[idx], Ischur)
+            if normalization == 'schur':
+                new_score = _max_score(int(p), order, score[idx], Ischur)
+            else:
+                new_score = _max_score(
+                    int(p), order, score[idx], info[np.ix_(idx, idx)])
+                new_score += _max_score(
+                    int(p), order, score[idx], (finfo - info)[np.ix_(idx, idx)])
+            new_index = torch.tensor(idx)[order[-int(p):]]
             if stat_type != 'autograd':
                 new_stat[1] = _compute_normalized_stat(new_score, int(p), thresh[1][j])
             if stat_type != 'scan':
@@ -312,16 +392,53 @@ def _compute_culinear_stat(score, info, thresh):
     except (RuntimeError, np.linalg.LinAlgError) as _:
         #inv, _ = torch.solve(sub_score.view(-1, 1), sub_info + 0.1 * torch.eye(self._dim))
         return 0.0
+    
+    
+def conjugate_grad(init_val, grad, max_iter=100, accuracy=1e-7):
+    """Solve a quadratic prolem using the conjugate gradient method.
+
+    Parameters
+    ----------
+    init_val : torch.Tensor
+        Initial point.
+    grad : callable
+        A function outputs the gradient of the quadratic.
+
+    Returns
+    -------
+    x : torch.Tensor
+        The solution to the problem.
+    """
+    x = init_val
+    r = -grad(x)
+    b = -grad(torch.zeros_like(x))
+    v = r
+    for k in range(max_iter):
+        Av = grad(v) + b
+        vnorm2 = torch.dot(v, Av)
+        rnorm2 = torch.dot(r, r)
+        t = rnorm2 / vnorm2
+        x = x + t * v  # update x in direction v
+        r = r - t * Av
+        if torch.norm(r) < accuracy:
+            break
+        beta = torch.dot(r, r) / rnorm2
+        v = r + beta * v
+    return x
 
 
 ##########################################################################
 # Miscellaneous
 ##########################################################################
 
-def _exceptions_handling(n, d, alpha, lag, idx, prange, trange, stat_type):
+def _exceptions_handling(n, d, alpha, lag, idx, prange, trange,
+                         stat_type, computation='standard'):
     """Handle exceptions and assign default values"""
     if stat_type not in ['linear', 'scan', 'autograd', 'all']:
         raise NameError("Invalid type of statistic. Only 'linear', 'scan', 'autograd', and 'all' are implemented.")
+    
+    if computation not in ['conjugate', 'standard']:
+        raise NameError("Invalid computation strategy. Only 'conjugate' and 'standard' are implemented.")
 
     if isinstance(alpha, float):
         alphas = [alpha, alpha, alpha/2, alpha/2]
