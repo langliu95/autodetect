@@ -320,7 +320,7 @@ class AutogradHmm(object):
         tau1, tau2, tau3 = self._recursive_smoother(obs)
         score = torch.sum(tau1, 0)
         info = torch.outer(score, score) + torch.sum(tau2 - tau3, 0)
-        return score, info
+        return score.detach(), info.detach()
 
     def compute_stats(self, obs, alpha=0.05, idx=None, prange=None, trange=None, stat_type='autograd'):
         """Compute test statistics.

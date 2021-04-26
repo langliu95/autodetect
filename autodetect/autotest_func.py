@@ -1,7 +1,7 @@
 """Module for autograd-test.
 
 Author: Lang Liu
-Date: 06/10/2019
+Date: 04/08/2021
 """
 
 from __future__ import absolute_import, division, print_function
@@ -17,86 +17,68 @@ from .utils import _compute_inv
 from .utils import _compute_normalized_stat
 from .utils import _compute_stats
 from .utils import _exceptions_handling
+from .utils import _get_batch
 from .utils import _return_results
 from .utils import _update_res
 
 
-class AutogradTest(object):
-    """A class for autograd-test for models inherited from :class:`torch.nn.Module`.
+class AutogradFunc(object):
+    """A class for autograd-test for models with a log-likelihood function.
 
-    Define and train your model using :class:`torch.nn.Module`
+    Implement the log-likelihood function using :class:`torch`
     before calling this class.
-
-    .. note::
-        This class treats all model parameters as a single parameter vector to
-        compute derivatives of the log-likelihood function.
-        This parameter vector is obtained by iterating over parameters of your
-        pre-trained model and reshaping each of them to a vector by row.
-
-        The log-likelihood function is closely related to loss function in
-        machine learning literature. Negative log-likelihood functions can be
-        used as loss functions; while some loss functions have corresponding
-        log-likelihood functions (such as mean square error versus
-        log-likelihood of Gaussian).
-
-        For latent variable models, computing the score and information may be
-        time-consuming. In that case you should consider implementing the
-        calculation using specifically designed algorithms (see, for instance, the
-        class :class:`AutogradHmm`).
 
     Parameters
     ----------
-    pretrained_model: torch.nn.Module
-        A pre-trained model inherited from :class:`torch.nn.Module`.
-    loglike: function
-        ``loglike(outputs, targets)`` is the log-likelihood of model parameters
-        given ``outputs`` and ``targets``.
+    loglike: callable
+        ``loglike(pars, obs)`` is the log-likelihood of model parameters
+        given ``obs``.
+    pars: list
+        List of model parameters.
     """
 
-    def __init__(self, pretrained_model, loglike):
-        super(AutogradTest, self).__init__()
-        self._dim = sum([par.numel() for par in pretrained_model.parameters() if
-                        par.requires_grad])
-        self._model = copy.deepcopy(pretrained_model)
+    def __init__(self, loglike, pars):
+        super(AutogradFunc, self).__init__()
         self._loglike = loglike
+        self._dim = sum([p.numel() for p in pars])
+        self._pars = [p.clone().detach().requires_grad_(True) for p in pars]
         self._max_iter = 2 * self._dim
         self._accuracy = 1e-7
         self._indices = range(self._dim)
 
-    def log_likelihood(self, inputs, targets):
+    def log_likelihood(self, obs):
         """Compute log-likelihood."""
-        outputs = self._model(inputs).view(-1)
-        return self._loglike(outputs, targets)
+        return self._loglike(self._pars, obs)
 
     def gradients(self):
-        """Get gradient of model parameters.
-
-        Returns an 1D ``Tensor`` contains the gradient of parameters.
-        """
-        grads = [p.grad.detach().view(-1) for p in self._model.parameters()]
+        """Get gradient of model parameters."""
+        grads = [p.grad.detach().view(-1) for p in self._pars]
         return torch.cat(grads)[self._indices]
 
     def zero_grad(self):
-        """Set gradient of the model to zero."""
-        self._model.zero_grad()
+        """Set gradient of model parameters to zero."""
+        for p in self._pars:
+            if p.grad is not None:
+                p.grad.data.zero_()
         
-    def score_func(self, inputs, targets):
+    def score_func(self, obs):
         """Compute score function."""
         self.zero_grad()
-        like = self.log_likelihood(inputs, targets)
-        like.backward()
+        obj = self.log_likelihood(obs)
+        obj.backward()
         return self.gradients()[self._indices]
     
-    def _score_func(self, inputs, targets):
-        obj = self.log_likelihood(inputs, targets)
-        grads = grad(obj, self._model.parameters(), create_graph=True)
+    def _score_func(self, obs):
+        """Compute score function."""
+        obj = self.log_likelihood(obs)
+        grads = grad(obj, self._pars, create_graph=True)
         grads = torch.cat([g.view(-1) for g in grads])[self._indices]
         return grads
 
-    def information(self, inputs, targets):
+    def information(self, obs):
         """Compute score function and information matrix."""
         self.zero_grad()
-        grads = self._score_func(inputs, targets)
+        grads = self._score_func(obs)
         dim = len(self._indices)
         info = torch.zeros((dim, dim))
         ident = torch.eye(dim)
@@ -106,58 +88,55 @@ class AutogradTest(object):
             self.zero_grad()
         return grads.detach(), info.detach()
     
-    def vec_info_prod(self, inputs, targets, vec, create_graph=True):
+    def vec_info_prod(self, obs, vec, create_graph=True):
         """Compute vector-information product."""
         self.zero_grad()
         if create_graph:
-            grads = self._score_func(inputs, targets)
+            grads = self._score_func(obs)
         else:
             grads = self._grads[self._indices]
-        obj = -grads @ vec
-        obj.backward(retain_graph=True)
+        loss = -grads @ vec
+        loss.backward(retain_graph=True)
         return self.gradients()
 
-    # TODO: change the full information method in the same format by storing info
-    def inv_info_vec_prod(self, inputs, targets, vec,
-                          max_iter=100, accuracy=1e-7):
+    def inv_info_vec_prod(self, obs, vec, max_iter=100, accuracy=1e-7):
         """Compute inverse-information-vector product."""
         npar = len(vec)
         if npar == 1:
-            info = self.vec_info_prod(inputs, targets, torch.tensor([1.0]))
-            return (vec / info).detach()
+            diag_info = self.vec_info_prod(obs, torch.tensor([1.0]))
+            return vec / diag_info
         
         self.zero_grad()
-        self._grads = self._score_func(inputs, targets)
+        self._grads = self._score_func(obs)
         
         def quad_grad(x):
-            r = self.vec_info_prod(inputs, targets, x, create_graph=False) - vec
+            r = self.vec_info_prod(obs, x, create_graph=False) - vec
             return r
         
         init = torch.randn(npar)
         x = conjugate_grad(init, quad_grad, max_iter=max_iter,
                            accuracy=accuracy)
-
+        
         self._grads = None
         return x.detach()
 
-    def compute_stats(self, inputs, targets, alpha=0.05, lag=0, idx=None,
-                      prange=None, trange=None, stat_type='autograd',
-                      computation='standard', normalization='schur',
-                      max_iter=None, accuracy=1e-7):
+    def compute_stats(self, obs, alpha=0.05, lag=0, idx=None, prange=None,
+                      trange=None, stat_type='autograd', computation='standard',
+                      normalization='schur', max_iter=None, accuracy=1e-7):
         """Compute test statistics.
 
         This function performs score-based hypothesis tests to detect the
         existence of a change in machine learning systems as they learn from
         a continuous, possibly evolving, stream of data.
-        Three tests are implemented: the linear test, the scan test, and the autograd-test. The
-        linear statistic is the maximum score statistic over all possible locations of
-        change. The scan statistic is the maximum score statistic over all possible
-        locations of change, and over all possible subsets of parameters in which change occurs.
+        Three tests are implemented: the linear test, the scan test, and the
+        autograd-test. The linear statistic is the maximum score statistic over
+        all possible locations of change. The scan statistic is the maximum
+        score statistic over all possible locations of change, and over all
+        possible subsets of parameters in which change occurs.
 
         Parameters
         ----------
-        inputs: torch.Tensor, shape (size, dim)
-        targets: torch.Tensor, shape (size, \*)
+        obs: list of torch.Tensors
         alpha: double or list, optional
             Significance level(s). For the autograd-test it should be a list of length two,
             where the first element is the significance level for the linear statistic and
@@ -218,24 +197,23 @@ class AutogradTest(object):
         """
 
         alpha, idx, prange, trange = _exceptions_handling(
-            inputs.size(0), self._dim, alpha, lag, idx, prange, trange,
+            obs[0].size(0), self._dim, alpha, lag, idx, prange, trange,
             stat_type, computation)
         
         self._configuration(
             lag, idx, prange, trange, stat_type, max_iter, accuracy)
         
         # computes the score and information matrix once
-        score, info = self.information(inputs, targets)
+        score, info = self.information(obs)
         # computes thresholds once
         thresh = compute_thresholds(
             len(idx), max([1, max(trange) - min(trange)]),
             alpha, prange, stat_type)
         
         if computation == 'conjugate':
-            res = self._conjugate_stats(inputs, targets, score, info, thresh)
+            res = self._conjugate_stats(obs, score, info, thresh)
         else:
-            res = self._standard_stats(inputs, targets, score, info,
-                                       thresh, normalization)
+            res = self._standard_stats(obs, score, info, thresh, normalization)
         return res
     
     def _configuration(self, lag, idx, prange, trange,
@@ -252,7 +230,7 @@ class AutogradTest(object):
             self._max_iter = 2 * len(idx)
         self._accuracy = accuracy
     
-    def _standard_stats(self, inputs, targets, score, info, thresh, normalization):
+    def _standard_stats(self, obs, score, info, thresh, normalization):
         """Compute test statistics using the full Fisher information."""
         # computes the inverse of information matrix once
         Iinv = torch.eye(self._dim)
@@ -267,12 +245,11 @@ class AutogradTest(object):
         for i, t in enumerate(self._trange):
             if self._lag is not None:
                 lo = self._trange[i-1] if i > 0 else self._lag
-                _score, _info = self.information(
-                    inputs[(lo - self._lag):t], targets[(lo - self._lag):t])
+                _score, _info = self.information(_get_batch(obs, lo-self._lag, t))
                 score_t -= _score
                 info_t -= _info
             else:
-                score_t, info_t = self.information(inputs[:t], targets[:t])
+                score_t, info_t = self.information(_get_batch(obs, 0, t))
                 score_t = score - score_t
                 info_t = info - info_t
             new_stat, new_index = _compute_stats(
@@ -282,8 +259,8 @@ class AutogradTest(object):
                 new_stat, stat, new_index, index, t, tau)
         return _return_results(stat, index, tau, self._stat_type)
     
-    def _conjugate_stats(self, inputs, targets, score, info, thresh):
-        """Compute test statistics using the conjugate gradient algorithm."""
+    def _conjugate_stats(self, obs, score, info, thresh):
+        """Compute test statistics using the conjugate gradient method."""
         idx = self._idx
         # computes test statistic
         stat, new_stat = torch.zeros(3), torch.zeros(3)
@@ -291,28 +268,24 @@ class AutogradTest(object):
         index = [idx, np.arange(max(self._prange)), idx]
         new_index = list(index)
         # compute the diagonal information in the middle once
-        half = int(len(inputs)/2)
-        info_diag = self._compute_info_diag(
-            inputs[:half], targets[:half], info, idx)
+        info_diag = self._compute_info_diag(obs, int(len(obs[0])/2), info, idx)
         for t in self._trange:
-            self._grads = self._score_func(inputs[:t], targets[:t])
+            batch = _get_batch(obs, 0, t)
+            self._grads = self._score_func(batch)
             score_t = self._grads.detach()
             score_t = score - score_t
             # linear statistics
             if self._stat_type in ['linear', 'autograd', 'all']:
                 _stat = self._conjugate_raw_stat(
-                    inputs[:t], targets[:t], score_t[idx],
-                    info[np.ix_(idx, idx)], idx)
+                    batch, score_t[idx], info[np.ix_(idx, idx)], idx)
                 new_stat[0] = _compute_normalized_stat(_stat, len(idx), thresh[0])
                 new_stat[2] = _compute_normalized_stat(_stat, len(idx), thresh[2])
                 new_index[2] = idx
             # scan statistics ([I_{1:tau}]_{T, T}^{-1} + [I_{tau+1:n}]_{T, T}^{-1})
             if self._stat_type in ['scan', 'autograd', 'all']:
-                # order = self._conjugate_sort_diag(
-                #     inputs[:t], targets[:t], score_t[idx], info[np.ix_(idx, idx)])
                 order = self._sort_diag(score_t[idx], info_diag)
                 _stat, _index = self._conjugate_scan_stat(
-                    inputs[:t], targets[:t], score_t, info, thresh, order)
+                    batch, score_t, info, thresh, order)
                 new_stat[1], new_index[1] = _stat[1], _index[1]
                 if _stat[2] > new_stat[2]:
                     new_stat[2], new_index[2] = _stat[2], _index[2]
@@ -323,26 +296,24 @@ class AutogradTest(object):
         self._grads = None
         return _return_results(stat, index, tau, self._stat_type)
     
-    def _conjugate_raw_stat(self, inputs, targets, score, full_info, indices=None):
+    def _conjugate_raw_stat(self, obs, score, full_info, indices=None):
         """Compute the unnormalized score statistic at a given changepoint."""
         self.zero_grad()
         if indices is not None:
             self._indices = indices
-        stat = score @ self._inv_info_vec_prod(inputs, targets, score)
-        stat += score @ self._inv_info_vec_prod(
-            inputs, targets, score, info=full_info)
+        stat = score @ self._inv_info_vec_prod(obs, score)
+        stat += score @ self._inv_info_vec_prod(obs, score, info=full_info)
         self._indices = range(self._dim)
         return stat
     
-    def _conjugate_scan_stat(self, inputs, targets, score, full_info,
-                             thresh, order):
+    def _conjugate_scan_stat(self, obs, score, full_info, thresh, order):
         """Compute the scan statistic given the ordering and the changepoint."""
         stat = torch.zeros(3)
         index = [self._idx, np.arange(max(self._prange)), self._idx]
         for j, p in enumerate(self._prange):
             _idx = torch.tensor(self._idx)[order[-p:]]
             _stat = self._conjugate_raw_stat(
-                inputs, targets, score[_idx], full_info[np.ix_(_idx, _idx)], _idx)
+                obs, score[_idx], full_info[np.ix_(_idx, _idx)], _idx)
             if self._stat_type in ['scan', 'all']:
                 new_stat = _compute_normalized_stat(_stat, int(p), thresh[1][j])
                 if new_stat > stat[1]:
@@ -353,38 +324,44 @@ class AutogradTest(object):
                     stat[2], index[2] = new_stat, _idx
         return stat, index
     
-    def _compute_info_diag(self, inputs, targets, info, idx):
-        """Compute the diagonal information matrices."""
-        _, half_info = self.information(inputs, targets)
+    def _compute_info_diag(self, obs, t, info, idx):
+        """Compute the diagonal information matrices at time ``t``."""
+        batch = _get_batch(obs, 0, t)
+        _, half_info = self.information(batch)
         info_diag = [
             torch.diag(half_info)[idx], torch.diag(info - half_info)[idx]]
         return info_diag
     
     def _sort_diag(self, score, info_diag):
         """Sort the score statistic according to the diagonal terms."""
+        # old_info_diag = torch.zeros(len(self._idx))
+        # for i, ind in enumerate(self._idx):
+        #     vec = torch.zeros(self._dim)
+        #     vec[ind] = 1
+        #     old_info_diag[i] = self.vec_info_prod(obs, vec)[ind]
+        # stat_diag = score**2 / old_info_diag
+        # stat_diag += score**2 / (torch.diag(full_info) - old_info_diag)
         stat_diag = score**2 / info_diag[0]
         stat_diag += score**2 / info_diag[1]
         _, order = torch.sort(stat_diag)
         return order
 
-    def _inv_info_vec_prod(self, inputs, targets, vec, info=None):
+    def _inv_info_vec_prod(self, obs, vec, info=None):
         """Compute inverse-information-vector product."""
         npar = len(vec)
         if npar == 1:
-            diag_info = self.vec_info_prod(inputs, targets, torch.tensor([1.0]))
+            diag_info = self.vec_info_prod(obs, torch.tensor([1.0]))
             if info is not None:
                 diag_info = info[0] - diag_info
             return vec / diag_info
         
         if info is None:  # for I_{1:tau}
             def quad_grad(x):
-                r = self.vec_info_prod(
-                    inputs, targets, x, create_graph=False) - vec
+                r = self.vec_info_prod(obs, x, create_graph=False) - vec
                 return r
         else:  # for I_{1:n} - I_{1:tau}
             def quad_grad(x):
-                r = info @ x - self.vec_info_prod(
-                    inputs, targets, x, create_graph=False) - vec
+                r = info @ x - self.vec_info_prod(obs, x, create_graph=False) - vec
                 return r
         
         init = torch.randn(npar)
