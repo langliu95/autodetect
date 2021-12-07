@@ -1,6 +1,6 @@
 # Autodetect
-A package for a score-based change detection method, *autograd-test*, that can automatically report hidden changes in machine learning systems as they learn from a continuous, possibly evolving, stream of data.
-This is code accompanying the paper "[Score-based Change Detection for Gradient-based Learning Machines](https://stat.uw.edu/sites/default/files/2019-07/tr652.pdf)".
+A package for a score-based change detection method, *auto-test*, that can automatically report hidden changes in machine learning systems as they learn from a continuous, possibly evolving, stream of data.
+This is code accompanying the paper "[Score-Based Change Detection for Gradient-Based Learning Machines](https://arxiv.org/abs/2106.14122)" in ICASSP 2021.
 
 ## Prerequisites
 This package is based on [PyTorch](https://pytorch.org/). Other dependencies can be found in the file [environment.yml](environment.yml).
