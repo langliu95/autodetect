@@ -2,7 +2,7 @@ name: Build docs
 
 on:
   push:
-    branches: ["main"]
+    branches: ["master"]
 
 jobs:
   build-and-deploy:
