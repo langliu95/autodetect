@@ -45,7 +45,7 @@ extensions = [
     'sphinx.ext.coverage',
     'sphinx.ext.mathjax',
     'sphinx.ext.autosummary',
-    'numpydoc'
+    'sphinx.ext.napoleon',
 ]
 
 numpydoc_class_members_toctree = False
