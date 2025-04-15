@@ -33,7 +33,7 @@ dependencies = [
   "numpy>=1.21",
   "torch>=1.6",
   "scipy",
-  "sklearn",
+  "scikit-learn",
 ]
 
 [project.optional-dependencies]
