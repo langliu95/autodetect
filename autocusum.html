@@ -1,0 +1,354 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Online Change Detection &mdash; autodetect  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Text Topic Models" href="topic.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            autodetect
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="start.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API Summary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="simple.html">Simple Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="latent.html">Latent Variable Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="time.html">Time Series Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="topic.html">Text Topic Models</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Online Change Detection</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#autograd-test-cusum">Autograd-test-CuSum</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#api-reference">API reference</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#autodetect.utils.sample_square_Bessel"><code class="docutils literal notranslate"><span class="pre">sample_square_Bessel()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#autodetect.utils.sample_max_square_Bessel"><code class="docutils literal notranslate"><span class="pre">sample_max_square_Bessel()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#autodetect.utils.quantile_max_square_Bessel"><code class="docutils literal notranslate"><span class="pre">quantile_max_square_Bessel()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#autodetect.AutogradCuSum"><code class="docutils literal notranslate"><span class="pre">AutogradCuSum</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#autodetect.AutogradCuSum.compute_stats"><code class="docutils literal notranslate"><span class="pre">AutogradCuSum.compute_stats()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#autodetect.AutogradCuSum.gradients"><code class="docutils literal notranslate"><span class="pre">AutogradCuSum.gradients()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#autodetect.AutogradCuSum.initial_model"><code class="docutils literal notranslate"><span class="pre">AutogradCuSum.initial_model()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#autodetect.AutogradCuSum.log_likelihood"><code class="docutils literal notranslate"><span class="pre">AutogradCuSum.log_likelihood()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#autodetect.AutogradCuSum.model_parameters"><code class="docutils literal notranslate"><span class="pre">AutogradCuSum.model_parameters()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#autodetect.AutogradCuSum.update_information"><code class="docutils literal notranslate"><span class="pre">AutogradCuSum.update_information()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">autodetect</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Online Change Detection</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/autocusum.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="online-change-detection">
+<h1>Online Change Detection<a class="headerlink" href="#online-change-detection" title="Link to this heading"></a></h1>
+<p>In some situations data may arrive continually (or the full dataset is too large to be stored in memory),
+so an algorithm which continuously inspects the machine learning system as new data arrive is desirable.
+This package contains an online variant of the autograd-test, called <em>autograd-test-CuSum</em>.</p>
+<p>In consideration of computational time, this approach is only implemented for independent models, that is, it assumes observations in the dataset are independent.
+In addition, online approximation is employed in order to compute the statistic in a linear (in sample size) time.
+Consequently, this algorithm may perform poorly when the number of parameters is large.</p>
+<p>To control the false discovery rate, a sample size indicating the total number of observations used for change detection is required.
+After that number of observations, you may reinitialize the algorithm and run it on new data.</p>
+<section id="autograd-test-cusum">
+<h2>Autograd-test-CuSum<a class="headerlink" href="#autograd-test-cusum" title="Link to this heading"></a></h2>
+<p>For illustration purpose, let’s generate some observations from a linear regression model.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="n">n</span> <span class="o">=</span> <span class="mi">10000</span>
+<span class="n">train_size</span> <span class="o">=</span> <span class="mi">3000</span>
+<span class="n">dim</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="n">tau</span> <span class="o">=</span> <span class="mi">6000</span> <span class="o">+</span> <span class="n">train_size</span>
+<span class="n">total</span> <span class="o">=</span> <span class="n">n</span> <span class="o">+</span> <span class="n">train_size</span>
+<span class="c1"># generates observations</span>
+<span class="n">inputs</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">((</span><span class="n">total</span><span class="p">,</span> <span class="n">dim</span><span class="p">))</span>
+<span class="n">targets</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="n">total</span><span class="p">)</span>
+<span class="n">delta</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">dim</span><span class="p">)</span>
+<span class="n">delta</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.5</span>
+<span class="n">targets</span><span class="p">[</span><span class="n">tau</span><span class="p">:]</span> <span class="o">+=</span> <span class="n">torch</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">inputs</span><span class="p">[</span><span class="n">tau</span><span class="p">:],</span> <span class="n">delta</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Then we train a linear model using the first <code class="docutils literal notranslate"><span class="pre">train_size</span></code> observations.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">torch.nn</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">nn</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">autodetect</span><span class="w"> </span><span class="kn">import</span> <span class="n">AutogradCuSum</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">autodetect.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">Linear</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">loglike</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">tar</span><span class="p">):</span>
+    <span class="n">loss_fn</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">MSELoss</span><span class="p">(</span><span class="n">reduction</span><span class="o">=</span><span class="s1">&#39;sum&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="o">-</span><span class="n">loss_fn</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">tar</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
+
+<span class="n">linear</span> <span class="o">=</span> <span class="n">Linear</span><span class="p">(</span><span class="n">dim</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">optim</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="n">linear</span><span class="o">.</span><span class="n">parameters</span><span class="p">())</span>
+<span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10000</span><span class="p">):</span>
+    <span class="n">optim</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
+    <span class="n">outs</span> <span class="o">=</span> <span class="n">linear</span><span class="p">(</span><span class="n">inputs</span><span class="p">[:</span><span class="n">train_size</span><span class="p">])</span>
+    <span class="n">loss</span> <span class="o">=</span> <span class="o">-</span><span class="n">loglike</span><span class="p">(</span><span class="n">outs</span><span class="p">,</span> <span class="n">targets</span><span class="p">[:</span><span class="n">train_size</span><span class="p">])</span>
+    <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
+    <span class="n">optim</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+<span class="n">autocusum</span> <span class="o">=</span> <span class="n">AutogradCuSum</span><span class="p">(</span><span class="n">linear</span><span class="p">,</span> <span class="n">loglike</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Different from autograd-test, we need to compute the threshold before calling the algorithm,
+where the threshold for the linear test at significance level <span class="math notranslate nohighlight">\(\alpha\)</span> is the upper <span class="math notranslate nohighlight">\((1-\alpha)\)</span>-quantile of the maximum of the square <a class="reference external" href="https://en.wikipedia.org/wiki/Bessel_process">Bessel process</a>.
+Here we utilize the algorithm described in the book <a class="reference external" href="https://www.springer.com/us/book/9780387004518">“Monte Carlo Methods in Financial Engineering”</a> to directly sample from the maximum of the sqaure Bessel process, which is implemented in the function <code class="docutils literal notranslate"><span class="pre">quantile_max_square_Bessel</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">autodetect.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">quantile_max_square_Bessel</span>
+<span class="n">thresh</span> <span class="o">=</span> <span class="n">quantile_max_square_Bessel</span><span class="p">(</span><span class="mf">0.95</span><span class="p">,</span> <span class="n">dim</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2000</span><span class="p">,</span> <span class="mi">5000</span><span class="p">)</span>  <span class="c1"># dim+1 for intercept</span>
+</pre></div>
+</div>
+<p>Next, we run it on the first half sample.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">targets</span> <span class="o">=</span> <span class="n">targets</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>  <span class="c1"># reshape targets for autodetect</span>
+<span class="n">size1</span> <span class="o">=</span> <span class="mi">5000</span> <span class="o">+</span> <span class="n">train_size</span>  <span class="c1"># include train_size</span>
+<span class="n">autocusum</span><span class="o">.</span><span class="n">initial_model</span><span class="p">(</span><span class="n">inputs</span><span class="p">[:</span><span class="n">train_size</span><span class="p">],</span> <span class="n">targets</span><span class="p">[:</span><span class="n">train_size</span><span class="p">],</span> <span class="n">size1</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">train_size</span><span class="p">,</span> <span class="n">size1</span><span class="p">):</span>  <span class="c1"># feed one obs at a time</span>
+    <span class="n">stat</span> <span class="o">=</span> <span class="n">autocusum</span><span class="o">.</span><span class="n">compute_stats</span><span class="p">(</span><span class="n">inputs</span><span class="p">[</span><span class="n">i</span><span class="p">:(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)],</span> <span class="n">targets</span><span class="p">[</span><span class="n">i</span><span class="p">:(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)],</span> <span class="n">thresh</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">stat</span> <span class="o">&gt;</span> <span class="mf">1.0</span><span class="p">:</span>
+        <span class="n">rej_length</span> <span class="o">=</span> <span class="n">i</span> <span class="o">-</span> <span class="n">train_size</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;rejection at the </span><span class="si">{}</span><span class="s2">-th new observation.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">rej_length</span><span class="p">))</span>
+        <span class="k">break</span>
+</pre></div>
+</div>
+<p>Finally, we reinitialize the algorithm and run it on the second half sample.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">size2</span> <span class="o">=</span> <span class="n">total</span> <span class="o">-</span> <span class="n">size1</span> <span class="o">+</span> <span class="n">train_size</span>
+<span class="n">autocusum</span><span class="o">.</span><span class="n">initial_model</span><span class="p">(</span><span class="n">inputs</span><span class="p">[:</span><span class="n">train_size</span><span class="p">],</span> <span class="n">targets</span><span class="p">[:</span><span class="n">train_size</span><span class="p">],</span> <span class="n">size2</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">size1</span><span class="p">,</span> <span class="n">total</span><span class="p">):</span>  <span class="c1"># feed one obs at a time</span>
+    <span class="n">stat</span> <span class="o">=</span> <span class="n">autocusum</span><span class="o">.</span><span class="n">compute_stats</span><span class="p">(</span><span class="n">inputs</span><span class="p">[</span><span class="n">i</span><span class="p">:(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)],</span> <span class="n">targets</span><span class="p">[</span><span class="n">i</span><span class="p">:(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)],</span> <span class="n">thresh</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">stat</span> <span class="o">&gt;</span> <span class="mf">1.0</span><span class="p">:</span>
+        <span class="n">rej_length</span> <span class="o">=</span> <span class="n">i</span> <span class="o">-</span> <span class="n">size1</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;rejection at the </span><span class="si">{}</span><span class="s2">-th new observation.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">rej_length</span><span class="p">))</span>
+        <span class="k">break</span>
+</pre></div>
+</div>
+</section>
+<section id="api-reference">
+<h2>API reference<a class="headerlink" href="#api-reference" title="Link to this heading"></a></h2>
+<p>For threshold:</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="autodetect.utils.sample_square_Bessel">
+<span class="sig-prename descclassname"><span class="pre">autodetect.utils.</span></span><span class="sig-name descname"><span class="pre">sample_square_Bessel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">T</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#autodetect.utils.sample_square_Bessel" title="Link to this definition"></a></dt>
+<dd><p>Generate a sample path from square Bessel process.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> (<em>int</em>) – Degree of freedom.</p></li>
+<li><p><strong>path_size</strong> (<em>int</em>) – Number of observations on the sample path.</p></li>
+<li><p><strong>T</strong> (<em>float</em><em>, </em><em>optional</em>) – End time of the square Bessel process. Default is 1.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="autodetect.utils.sample_max_square_Bessel">
+<span class="sig-prename descclassname"><span class="pre">autodetect.utils.</span></span><span class="sig-name descname"><span class="pre">sample_max_square_Bessel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">T</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#autodetect.utils.sample_max_square_Bessel" title="Link to this definition"></a></dt>
+<dd><p>Generate a sample from the maximum of square Bessel process.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> (<em>int</em>) – Degree of freedom.</p></li>
+<li><p><strong>path_size</strong> (<em>int</em>) – Number of observations on the sample path.</p></li>
+<li><p><strong>T</strong> (<em>float</em><em>, </em><em>optional</em>) – End time of the square Bessel process. Default is 1.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="autodetect.utils.quantile_max_square_Bessel">
+<span class="sig-prename descclassname"><span class="pre">autodetect.utils.</span></span><span class="sig-name descname"><span class="pre">quantile_max_square_Bessel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">q</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">T</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#autodetect.utils.quantile_max_square_Bessel" title="Link to this definition"></a></dt>
+<dd><p>Generate quantiles of the maximum of square Bessel process.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>q</strong> (<em>float</em>) – Percentile.</p></li>
+<li><p><strong>df</strong> (<em>int</em>) – Degree of freedom.</p></li>
+<li><p><strong>path_size</strong> (<em>int</em>) – Number of observations on the sample path.</p></li>
+<li><p><strong>size</strong> (<em>int</em>) – Number of observations used to estimate the quantile.</p></li>
+<li><p><strong>T</strong> (<em>float</em><em>, </em><em>optional</em>) – End time of the square Bessel process. Default is 1.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<p>For autograd-test-CuSum:</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="autodetect.AutogradCuSum">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">autodetect.</span></span><span class="sig-name descname"><span class="pre">AutogradCuSum</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pretrained_model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loglike</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#autodetect.AutogradCuSum" title="Link to this definition"></a></dt>
+<dd><p>A class for change point detection via autograd-test-CuSum.</p>
+<p>This is an online variant of autograd-test, and it only supports independent data.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This class treats all model parameters as a single parameter vector to
+compute the derivatives of the log-likelihood function.
+This parameter vector is obtained by iterating over parameters of your
+pre-trained model and reshaping each of them to a vector by row.</p>
+<p>The log-likelihood function is closely related to loss function in
+machine learning literature. Negative log-likelihood functions can be
+used as loss functions; while some loss functions have corresponding
+log-likelihood functions (such as mean square error versus
+log-likelihood of Gaussian).</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pretrained_model</strong> (<em>torch.nn.Module</em>) – A pre-trained model inherited from <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.Module</span></code>.</p></li>
+<li><p><strong>loglike</strong> (<em>function</em>) – <code class="docutils literal notranslate"><span class="pre">loglike(outputs,</span> <span class="pre">targets)</span></code> is the log-likelihood of model parameters
+given <code class="docutils literal notranslate"><span class="pre">outputs</span></code> and <code class="docutils literal notranslate"><span class="pre">targets</span></code>.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="autodetect.AutogradCuSum.compute_stats">
+<span class="sig-name descname"><span class="pre">compute_stats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inputs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">targets</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">thresh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_thresh</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">idx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#autodetect.AutogradCuSum.compute_stats" title="Link to this definition"></a></dt>
+<dd><p>Compute statistics given new (inputs, targets).</p>
+<p>Currently only the linear statistic is supported.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>inputs</strong> (<em>torch.Tensor</em><em>, </em><em>shape</em><em> (</em><em>size</em><em>, </em><em>dim</em><em>)</em>)</p></li>
+<li><p><strong>targets</strong> (torch.Tensor, shape (size, <a href="#id1"><span class="problematic" id="id2">*</span></a>))</p></li>
+<li><p><strong>thresh</strong> (<em>float</em>) – Threshold for the stopping criterion. Use the method <code class="docutils literal notranslate"><span class="pre">quantile_max_square_Bessel</span></code> to compute it.</p></li>
+<li><p><strong>min_thresh</strong> (<em>float</em><em>, </em><em>optional</em>) – Reinitialize the process whenever the current statistic is
+below this threshold. Default is zero.</p></li>
+<li><p><strong>idx</strong> (<em>array-like</em><em>, </em><em>optional</em>) – Indices of parameters of interest (the rest parameters are considered constants)
+in the parameter vector.
+Default is <code class="docutils literal notranslate"><span class="pre">None</span></code>, which will be set to <code class="docutils literal notranslate"><span class="pre">range(dim)</span></code>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="autodetect.AutogradCuSum.gradients">
+<span class="sig-name descname"><span class="pre">gradients</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#autodetect.AutogradCuSum.gradients" title="Link to this definition"></a></dt>
+<dd><p>Get gradients of model parameters.</p>
+<p>Returns a 1D <code class="docutils literal notranslate"><span class="pre">Tensor</span></code> contains the derivatives of each parameters in
+the parameter vector.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="autodetect.AutogradCuSum.initial_model">
+<span class="sig-name descname"><span class="pre">initial_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inputs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">targets</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_size</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#autodetect.AutogradCuSum.initial_model" title="Link to this definition"></a></dt>
+<dd><p>Set up inital model.</p>
+<p>Inputs and targets are the data used for training, and they must be
+iterable.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="autodetect.AutogradCuSum.log_likelihood">
+<span class="sig-name descname"><span class="pre">log_likelihood</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inputs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">targets</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#autodetect.AutogradCuSum.log_likelihood" title="Link to this definition"></a></dt>
+<dd><p>Compute log-likelihood.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="autodetect.AutogradCuSum.model_parameters">
+<span class="sig-name descname"><span class="pre">model_parameters</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#autodetect.AutogradCuSum.model_parameters" title="Link to this definition"></a></dt>
+<dd><p>Get model parameters.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="autodetect.AutogradCuSum.update_information">
+<span class="sig-name descname"><span class="pre">update_information</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inputs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">targets</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#autodetect.AutogradCuSum.update_information" title="Link to this definition"></a></dt>
+<dd><p>Compute score function and information matrix (first derivatives).</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This function will set gradients of the model to zero.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>inputs</strong> (<em>torch.Tensor</em><em>, </em><em>shape</em><em> (</em><em>size</em><em>, </em><em>dim</em><em>)</em>)</p></li>
+<li><p><strong>targets</strong> (torch.Tensor, shape (size, <a href="#id3"><span class="problematic" id="id4">*</span></a>))</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="topic.html" class="btn btn-neutral float-left" title="Text Topic Models" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2019, Lang Liu, Joseph Salmon, and Zaid Harchaoui..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

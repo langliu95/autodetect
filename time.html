@@ -1,0 +1,253 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Time Series Models &mdash; autodetect  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Text Topic Models" href="topic.html" />
+    <link rel="prev" title="Latent Variable Models" href="latent.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            autodetect
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="start.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API Summary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="simple.html">Simple Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="latent.html">Latent Variable Models</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Time Series Models</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#autoregressive-moving-average-models">Autoregressive–moving-average models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#api-reference">API reference</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#autodetect.autograd_arma"><code class="docutils literal notranslate"><span class="pre">autograd_arma()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="topic.html">Text Topic Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="autocusum.html">Online Change Detection</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">autodetect</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Time Series Models</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/time.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="time-series-models">
+<h1>Time Series Models<a class="headerlink" href="#time-series-models" title="Link to this heading"></a></h1>
+<p>A <a class="reference external" href="https://en.wikipedia.org/wiki/Time_series">time series</a> refers to a series of data points indexed in time order.
+A time series model represents the ideal data-generating process of a time series, assuming
+the current data point depends on previous ones.
+Consequently, computing the log-likelihood function and its derivatives can be time-consuming if the dependency structure is complicated.
+Hence, to compute the test statistic more efficiently, algorithms utilize model-specific structure are required.</p>
+<p>For <a class="reference external" href="https://en.wikipedia.org/wiki/Autoregressive%E2%80%93moving-average_model">autoregressive–moving-average (ARMA)</a> models, you can use the method <code class="docutils literal notranslate"><span class="pre">autograd_arma</span></code> to detect hidden changes.</p>
+<section id="autoregressive-moving-average-models">
+<h2>Autoregressive–moving-average models<a class="headerlink" href="#autoregressive-moving-average-models" title="Link to this heading"></a></h2>
+<p>Here is an example on how to apply this class to detect changepoint in an ARMA model.
+To begin with, let’s define functions for generating ARMA parameters with a change
+in AR parameters such that the ARMA model is stationary before and after the change.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy.random</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">npr</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">pars_for_arma</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">seed</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Generates parameters for ARMA model.&quot;&quot;&quot;</span>
+    <span class="n">npr</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+    <span class="c1"># generates roots with absolute value larger than 1</span>
+    <span class="n">ar_root</span> <span class="o">=</span> <span class="n">npr</span><span class="o">.</span><span class="n">exponential</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span> <span class="o">+</span> <span class="mf">1.0</span>
+    <span class="n">ar_root</span> <span class="o">*=</span> <span class="n">npr</span><span class="o">.</span><span class="n">choice</span><span class="p">([</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">p</span><span class="p">)</span>
+    <span class="n">ma_root</span> <span class="o">=</span> <span class="n">npr</span><span class="o">.</span><span class="n">exponential</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">q</span><span class="p">)</span> <span class="o">+</span> <span class="mf">1.0</span>
+    <span class="n">ma_root</span> <span class="o">*=</span> <span class="n">npr</span><span class="o">.</span><span class="n">choice</span><span class="p">([</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">q</span><span class="p">)</span>
+    <span class="c1"># extract coefficients</span>
+    <span class="n">phi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">polynomial</span><span class="o">.</span><span class="n">polynomial</span><span class="o">.</span><span class="n">polyfromroots</span><span class="p">(</span><span class="n">ar_root</span><span class="p">)</span>
+    <span class="n">phi</span> <span class="o">/=</span> <span class="o">-</span><span class="n">phi</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">the</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">polynomial</span><span class="o">.</span><span class="n">polynomial</span><span class="o">.</span><span class="n">polyfromroots</span><span class="p">(</span><span class="n">ma_root</span><span class="p">)</span>
+    <span class="n">the</span> <span class="o">/=</span> <span class="n">the</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">phi</span><span class="p">,</span> <span class="n">the</span><span class="p">,</span> <span class="n">ar_root</span><span class="p">,</span> <span class="n">ma_root</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">change_for_ar</span><span class="p">(</span><span class="n">phi</span><span class="p">,</span> <span class="n">ar_root</span><span class="p">,</span> <span class="n">r</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Generates change for AR model.&quot;&quot;&quot;</span>
+    <span class="n">ar_new_root</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">r</span><span class="p">)</span> <span class="o">*</span> <span class="n">ar_root</span>  <span class="c1"># add a portion to ar_root</span>
+    <span class="n">phi_new</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">polynomial</span><span class="o">.</span><span class="n">polynomial</span><span class="o">.</span><span class="n">polyfromroots</span><span class="p">(</span><span class="n">ar_new_root</span><span class="p">)</span>
+    <span class="n">phi_new</span> <span class="o">/=</span> <span class="o">-</span><span class="n">phi_new</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">delta</span> <span class="o">=</span> <span class="n">phi_new</span> <span class="o">-</span> <span class="n">phi</span>  <span class="c1"># post-change - pre-change</span>
+    <span class="k">return</span> <span class="n">delta</span>
+</pre></div>
+</div>
+<p>Now we can generate a synthetic sample from an ARMA model with a changepoint.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">autodetect.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">Generator</span>
+<span class="n">n</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">tau0</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">500</span>
+<span class="n">seed</span> <span class="o">=</span> <span class="mi">11919</span>
+<span class="n">phi</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="n">ar_root</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">pars_for_arma</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">seed</span><span class="p">)</span>  <span class="c1"># parameters before change</span>
+<span class="n">delta</span> <span class="o">=</span> <span class="n">change_for_ar</span><span class="p">(</span><span class="n">phi</span><span class="p">,</span> <span class="n">ar_root</span><span class="p">,</span> <span class="mf">0.25</span><span class="p">)</span>  <span class="c1"># change in AR parameters</span>
+<span class="n">delta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">r_</span><span class="p">[</span><span class="n">delta</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">q</span><span class="p">)]</span>
+<span class="n">gen</span> <span class="o">=</span> <span class="n">Generator</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">tau0</span><span class="p">)</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">gen</span><span class="o">.</span><span class="n">arma</span><span class="p">(</span><span class="n">phi</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="n">delta</span><span class="p">,</span> <span class="n">theta</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+</pre></div>
+</div>
+<p>Next, we proceed by computing the MLE of parameters under null hypothesis using the package
+<code class="xref py py-class docutils literal notranslate"><span class="pre">statsmodels</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">statsmodels.tsa.arima_model</span><span class="w"> </span><span class="kn">import</span> <span class="n">ARMA</span>
+<span class="n">cmle</span> <span class="o">=</span> <span class="n">ARMA</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">q</span><span class="p">))</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s1">&#39;css&#39;</span><span class="p">,</span> <span class="n">trend</span><span class="o">=</span><span class="s1">&#39;nc&#39;</span><span class="p">)</span>  <span class="c1"># conditional MLE</span>
+<span class="n">mle</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">cmle</span><span class="o">.</span><span class="n">params</span><span class="p">)</span><span class="o">.</span><span class="n">float</span><span class="p">()</span>  <span class="c1"># convert the MLE to a torch.Tensor</span>
+<span class="n">mle</span><span class="o">.</span><span class="n">requires_grad</span> <span class="o">=</span> <span class="kc">True</span>
+</pre></div>
+</div>
+<p>Finally, to detection changepoint in this ARMA model, we need to convert all results to <cite>torch.Tensor</cite>
+and call the method <cite>autograd_arma</cite>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">autodetect</span><span class="w"> </span><span class="kn">import</span> <span class="n">autograd_arma</span>
+
+<span class="n">obs</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">([</span><span class="n">y</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n</span><span class="p">)]))</span><span class="o">.</span><span class="n">float</span><span class="p">()</span>
+<span class="n">sig2</span> <span class="o">=</span> <span class="n">cmle</span><span class="o">.</span><span class="n">sigma2</span>
+<span class="n">stat</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="n">index</span> <span class="o">=</span> <span class="n">autograd_arma</span><span class="p">(</span><span class="n">mle</span><span class="p">,</span> <span class="n">sig2</span><span class="p">,</span> <span class="n">obs</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">q</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>If change in MA parameters is of no interest, we can limit the
+detection to AR parameters.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">stat</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="n">index</span> <span class="o">=</span> <span class="n">autograd_arma</span><span class="p">(</span><span class="n">mle</span><span class="p">,</span> <span class="n">sig2</span><span class="p">,</span> <span class="n">obs</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">idx</span><span class="o">=</span><span class="nb">range</span><span class="p">(</span><span class="n">p</span><span class="p">))</span>
+</pre></div>
+</div>
+</section>
+<section id="api-reference">
+<h2>API reference<a class="headerlink" href="#api-reference" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="autodetect.autograd_arma">
+<span class="sig-prename descclassname"><span class="pre">autodetect.</span></span><span class="sig-name descname"><span class="pre">autograd_arma</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">theta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sig2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">q</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">idx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prange</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trange</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stat_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'autograd'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#autodetect.autograd_arma" title="Link to this definition"></a></dt>
+<dd><p>Compute autograd-test statistics for autoregressive–moving-average model.</p>
+<p>This function performs score-based hypothesis tests to detect the existence of
+a change in an autoregressive–moving-average model as
+it learns from a continuous, possibly evolving, stream of data.
+Three tests are implemented: the linear test, the scan test, and the autograd-test. The
+linear statistic is the maximum score statistic over all possible locations of
+change. The scan statistic is the maximum score statistic over all possible
+locations of change, and over all possible subsets of parameters in which change
+occurs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>theta</strong> (<em>torch.Tensor</em><em>, </em><em>shape</em><em> (</em><em>dim</em><em>,</em><em>)</em>) – Conditional maximum likelihood estimator of model parameters under null
+hypothesis (condition on the first <code class="docutils literal notranslate"><span class="pre">max(p,</span> <span class="pre">q)</span></code> observations).</p></li>
+<li><p><strong>sig2</strong> (<em>torch.Tensor</em>) – Variance of the residuals.</p></li>
+<li><p><strong>obs</strong> (<em>torch.Tensor</em><em>, </em><em>shape</em><em> (</em><em>size</em><em>, </em><em>2</em><em>)</em>) – The first column is observations and the second one is errors.</p></li>
+<li><p><strong>p</strong> (<em>int</em>) – Order of ARMA model.</p></li>
+<li><p><strong>q</strong> (<em>int</em>) – Order of ARMA model.</p></li>
+<li><p><strong>alpha</strong> (<em>double</em><em> or </em><em>list</em><em>, </em><em>optional</em>) – Significance level(s). For the autograd-test it should be a list of length two,
+where the first element is the significance level for the linear statistic and
+the second is for the scan statistic. Default is 0.05.</p></li>
+<li><p><strong>idx</strong> (<em>array-like</em><em>, </em><em>optional</em>) – Indices of parameters of interest (the rest parameters are considered constants)
+in the parameter vector.
+Default is <code class="docutils literal notranslate"><span class="pre">None</span></code>, which will be set to <code class="docutils literal notranslate"><span class="pre">range(dim)</span></code>.</p></li>
+<li><p><strong>prange</strong> (<em>array-like</em><em>, </em><em>optional</em>) – Change cardinality set over which the scan statistic is maximized.
+Default is <code class="docutils literal notranslate"><span class="pre">None</span></code>,
+which will be set to <code class="docutils literal notranslate"><span class="pre">range(1,</span> <span class="pre">min([int(np.sqrt(d)),</span> <span class="pre">len(idx)])</span> <span class="pre">+</span> <span class="pre">1)</span></code>.</p></li>
+<li><p><strong>trange</strong> (<em>array-like</em><em>, </em><em>optional</em>) – Change location set over which the statistic is maximized. Default is <code class="docutils literal notranslate"><span class="pre">None</span></code>,
+which will be set to <code class="docutils literal notranslate"><span class="pre">range(int(n</span> <span class="pre">/</span> <span class="pre">10)</span> <span class="pre">+</span> <span class="pre">lag,</span> <span class="pre">int(n</span> <span class="pre">*</span> <span class="pre">9</span> <span class="pre">/</span> <span class="pre">10))</span></code>.</p></li>
+<li><p><strong>stat_type</strong> (<em>str</em><em>, </em><em>optional</em>) – Type of statistic that is computed. It can take values in <code class="docutils literal notranslate"><span class="pre">['linear',</span> <span class="pre">'scan',</span>
+<span class="pre">'autograd',</span> <span class="pre">'all']</span></code>, where <code class="docutils literal notranslate"><span class="pre">'all'</span></code> indicates calculating all of them. Default is <code class="docutils literal notranslate"><span class="pre">'autograd'</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>stat</strong> (<em>torch.Tensor</em>) – Test statistic at level <code class="docutils literal notranslate"><span class="pre">alpha</span></code>. Reject null if it is larger than 1.</p></li>
+<li><p><strong>tau</strong> (<em>int</em>) – Location of changepoint corresponds to the test statistic.</p></li>
+<li><p><strong>index</strong> (<em>array-like</em>) – Indices of parameters correspond to the test statistic. It will be omitted for the linear test.</p></li>
+</ul>
+</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>NameError</strong> – If <code class="docutils literal notranslate"><span class="pre">stat_type</span></code> is not in <code class="docutils literal notranslate"><span class="pre">['linear',</span> <span class="pre">'scan',</span> <span class="pre">'autograd',</span> <span class="pre">'all']</span></code>.</p></li>
+<li><p><strong>ValueError</strong> – If <code class="docutils literal notranslate"><span class="pre">alpha</span></code> is not an instance of <code class="docutils literal notranslate"><span class="pre">float</span></code> or <code class="docutils literal notranslate"><span class="pre">list</span></code>; or if <code class="docutils literal notranslate"><span class="pre">prange</span></code>
+    is not within <code class="docutils literal notranslate"><span class="pre">range(1,</span> <span class="pre">len(idx)+1)</span></code>; or if <code class="docutils literal notranslate"><span class="pre">trange</span></code> is not within
+    <code class="docutils literal notranslate"><span class="pre">range(lag,</span> <span class="pre">size)</span></code>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="latent.html" class="btn btn-neutral float-left" title="Latent Variable Models" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="topic.html" class="btn btn-neutral float-right" title="Text Topic Models" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2019, Lang Liu, Joseph Salmon, and Zaid Harchaoui..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

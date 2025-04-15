@@ -1,0 +1,496 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Latent Variable Models &mdash; autodetect  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Time Series Models" href="time.html" />
+    <link rel="prev" title="Simple Models" href="simple.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            autodetect
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="start.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API Summary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="simple.html">Simple Models</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Latent Variable Models</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#hidden-markov-models">Hidden Markov models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#api-reference">API reference</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#autodetect.AutogradHmm"><code class="docutils literal notranslate"><span class="pre">AutogradHmm</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#autodetect.AutogradHmm.compute_stats"><code class="docutils literal notranslate"><span class="pre">AutogradHmm.compute_stats()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#autodetect.AutogradHmm.filtering"><code class="docutils literal notranslate"><span class="pre">AutogradHmm.filtering()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#autodetect.AutogradHmm.get_emission"><code class="docutils literal notranslate"><span class="pre">AutogradHmm.get_emission()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#autodetect.AutogradHmm.get_normalized_forward"><code class="docutils literal notranslate"><span class="pre">AutogradHmm.get_normalized_forward()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#autodetect.AutogradHmm.get_normalizing_constant"><code class="docutils literal notranslate"><span class="pre">AutogradHmm.get_normalizing_constant()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#autodetect.AutogradHmm.get_transition"><code class="docutils literal notranslate"><span class="pre">AutogradHmm.get_transition()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#autodetect.AutogradHmm.gradients"><code class="docutils literal notranslate"><span class="pre">AutogradHmm.gradients()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#autodetect.AutogradHmm.information"><code class="docutils literal notranslate"><span class="pre">AutogradHmm.information()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#autodetect.AutogradHmm.information_emission"><code class="docutils literal notranslate"><span class="pre">AutogradHmm.information_emission()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#autodetect.AutogradHmm.log_likelihood"><code class="docutils literal notranslate"><span class="pre">AutogradHmm.log_likelihood()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#autodetect.AutogradHmm.loglike_emission"><code class="docutils literal notranslate"><span class="pre">AutogradHmm.loglike_emission()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#autodetect.AutogradHmm.parameters"><code class="docutils literal notranslate"><span class="pre">AutogradHmm.parameters()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#autodetect.AutogradHmm.setup"><code class="docutils literal notranslate"><span class="pre">AutogradHmm.setup()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#autodetect.AutogradHmm.write_emission"><code class="docutils literal notranslate"><span class="pre">AutogradHmm.write_emission()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#autodetect.AutogradHmm.write_transition"><code class="docutils literal notranslate"><span class="pre">AutogradHmm.write_transition()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#autodetect.AutogradHmm.zero_grad"><code class="docutils literal notranslate"><span class="pre">AutogradHmm.zero_grad()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="time.html">Time Series Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="topic.html">Text Topic Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="autocusum.html">Online Change Detection</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">autodetect</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Latent Variable Models</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/latent.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="latent-variable-models">
+<h1>Latent Variable Models<a class="headerlink" href="#latent-variable-models" title="Link to this heading"></a></h1>
+<p>A latent variable model refers to a statistical model that relates
+a set of observable variables to a set of latent variables.
+It is assumed that responses on observable variables are the
+result of an individual’s state on the latent variable(s),
+and that observable variables are conditionally independent given latent (hidden) variables.
+Two well-known examples are <a class="reference external" href="https://en.wikipedia.org/wiki/Mixture_model">mixture model</a> and <a class="reference external" href="https://en.wikipedia.org/wiki/Hidden_Markov_model">hidden Markov model (HMM)</a>.
+For this kind of models, the log-likelihood function is the summation of
+full log-likelihood over latent variables.
+This indicates that the computation of log-likelihood as well as its first and second
+derivatives can be expensive when the latent state space is large.
+Hence, specific algorithms are required to compute the test statistic
+in a reasonable amount of time.</p>
+<p>For HMMs, you can use the class <code class="xref py py-class docutils literal notranslate"><span class="pre">AutogradHmm</span></code> to detect hidden changes.
+This class employs the normalized forward
+algorithm and the fixed point smoothing technique described in the book
+“<a class="reference external" href="http://people.bordeaux.inria.fr/pierre.delmoral/hmm-cappe-moulines-ryden.pdf">Inference in Hidden Markov Models</a>”
+to calculate the score function and observed information matrix.</p>
+<p>This package does not contain the implementation of the mixture model,
+but you may use <code class="xref py py-class docutils literal notranslate"><span class="pre">AutogradHmm</span></code> with a degenerate transition matrix.</p>
+<section id="hidden-markov-models">
+<h2>Hidden Markov models<a class="headerlink" href="#hidden-markov-models" title="Link to this heading"></a></h2>
+<p>Here is an example on how to apply this class to detect changepoint in an HMM.
+To begin with, let’s generate some observations from an HMM with normal emission distribution and with a change in transition matrix:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">autodetect.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">Generator</span>
+<span class="n">n</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">tau0</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">500</span>
+<span class="n">nu</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.6</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">])</span>
+<span class="n">tran0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.55</span><span class="p">,</span> <span class="mf">0.25</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.35</span><span class="p">,</span> <span class="mf">0.45</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">]])</span>
+<span class="n">delta0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="o">-</span><span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],</span> <span class="p">[</span><span class="o">-</span><span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">]])</span>
+<span class="n">emis0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">]])</span>
+<span class="n">gen</span> <span class="o">=</span> <span class="n">Generator</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">tau0</span><span class="p">)</span>
+<span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">gen</span><span class="o">.</span><span class="n">hmm_transition</span><span class="p">(</span><span class="n">tran0</span><span class="p">,</span> <span class="n">delta0</span><span class="p">,</span> <span class="n">emis0</span><span class="p">,</span> <span class="s1">&#39;Normal&#39;</span><span class="p">,</span> <span class="n">nu</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Next, we proceed by fitting the model to obtain the MLE of transition
+and emission parameters under null hypothesis using the package
+<code class="xref py py-class docutils literal notranslate"><span class="pre">pomegranate</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pomegranate</span><span class="w"> </span><span class="kn">import</span> <span class="n">HiddenMarkovModel</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pomegranate</span><span class="w"> </span><span class="kn">import</span> <span class="n">NormalDistribution</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">HiddenMarkovModel</span><span class="p">()</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">from_samples</span><span class="p">(</span><span class="n">NormalDistribution</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="p">[</span><span class="n">y</span><span class="p">])</span>
+<span class="n">tran</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">dense_transition_matrix</span><span class="p">()[:</span><span class="n">N</span><span class="p">,</span> <span class="p">:</span><span class="n">N</span><span class="p">]</span>
+<span class="n">emis</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">states</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">get_params</span><span class="p">()[</span><span class="s1">&#39;states&#39;</span><span class="p">]</span>
+<span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
+    <span class="n">emis</span> <span class="o">+=</span> <span class="n">states</span><span class="p">[</span><span class="n">s</span><span class="p">]</span><span class="o">.</span><span class="n">distribution</span><span class="o">.</span><span class="n">parameters</span>
+<span class="n">emis</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">emis</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><code class="docutils literal notranslate"><span class="pre">tran</span></code> and <code class="docutils literal notranslate"><span class="pre">emis</span></code> are estimates of <code class="docutils literal notranslate"><span class="pre">tran0</span></code> and <code class="docutils literal notranslate"><span class="pre">emis0</span></code> up to a
+switch of rows and columns.</p>
+</div>
+<p>To detection changepoint in this HMM, we need to subclass <code class="xref py py-class docutils literal notranslate"><span class="pre">AutogradHmm</span></code> and
+override the method <code class="docutils literal notranslate"><span class="pre">loglike_emission</span></code>, that is, the
+log-likelihood for a normal distribution in our example.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">autodetect</span><span class="w"> </span><span class="kn">import</span> <span class="n">AutogradHmm</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">MyHMM</span><span class="p">(</span><span class="n">AutogradHmm</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_states</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">MyHMM</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">n_states</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">loglike_emission</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obs</span><span class="p">,</span> <span class="n">states</span><span class="p">):</span>
+        <span class="n">emis</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_emission</span><span class="p">()[</span><span class="n">states</span><span class="p">,</span> <span class="p">:]</span>
+        <span class="k">return</span> <span class="o">-</span><span class="p">((</span><span class="n">obs</span> <span class="o">-</span> <span class="n">emis</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="n">emis</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="o">**</span><span class="mi">2</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">-</span>\
+            <span class="n">torch</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="p">))</span><span class="o">.</span><span class="n">float</span><span class="p">()</span> <span class="o">*</span> <span class="n">emis</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>Finally, we provide the HMM with the MLE of the transition and emission parameters and compute the autograd-test statistic:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">my_hmm</span> <span class="o">=</span> <span class="n">MyHMM</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
+<span class="n">my_hmm</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span><span class="n">tran</span><span class="p">,</span> <span class="n">emis</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+<span class="n">obs</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">y</span><span class="p">)</span><span class="o">.</span><span class="n">float</span><span class="p">()</span>
+<span class="n">stat</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="n">index</span> <span class="o">=</span> <span class="n">my_hmm</span><span class="o">.</span><span class="n">compute_stats</span><span class="p">(</span><span class="n">obs</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>If change in emission parameters is of no interest, we can limit the
+detection to transition parameters.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">stat</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="n">index</span> <span class="o">=</span> <span class="n">my_hmm</span><span class="o">.</span><span class="n">compute_stats</span><span class="p">(</span><span class="n">obs</span><span class="p">,</span> <span class="n">idx</span><span class="o">=</span><span class="nb">range</span><span class="p">(</span><span class="n">N</span> <span class="o">*</span> <span class="p">(</span><span class="n">N</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)))</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For this model both transition and emission parameters are unknown, so
+the indices for transition parameters are <span class="math notranslate nohighlight">\(0, \dots, N(N-1)-1\)</span>.</p>
+</div>
+</section>
+<section id="api-reference">
+<h2>API reference<a class="headerlink" href="#api-reference" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="autodetect.AutogradHmm">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">autodetect.</span></span><span class="sig-name descname"><span class="pre">AutogradHmm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_states</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#autodetect.AutogradHmm" title="Link to this definition"></a></dt>
+<dd><p>A class for autograd-test in hidden Markov model.</p>
+<p>This class only supports hidden Markov models (HMMs) with finite hidden
+states.</p>
+<p>Your models should subclass this class with the method
+<code class="docutils literal notranslate"><span class="pre">loglike_emission</span></code> being overridden.
+Then you need to use the method <code class="docutils literal notranslate"><span class="pre">setup</span></code> to provide the MLE of model parameters
+under null hypothesis (no change exists).</p>
+<p>You may use the module <code class="xref py py-class docutils literal notranslate"><span class="pre">pomegranate</span></code> to train your model.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This class treats all model parameters as a single parameter vector to
+compute the derivatives of the log-likelihood function.
+For transition (emission) matrix, its parameter vector is
+obtained by reshaping the first <code class="docutils literal notranslate"><span class="pre">n_states</span> <span class="pre">*</span> <span class="pre">(n_states</span> <span class="pre">-</span> <span class="pre">1)</span></code>
+submatrix by row.
+For non-discrete emission distribution, its parameter vector is
+obtained by reshaping its parameter matrix by row, whose <span class="math notranslate nohighlight">\(k\)</span>-th
+row contains parameters of emission distribution given hidden state <span class="math notranslate nohighlight">\(k\)</span>.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n_states</strong> (<em>int</em>) – Number of hidden states.</p></li>
+<li><p><strong>init</strong> (<em>torch.Tensor</em><em>, </em><em>optional</em>) – Initial distribution for hidden states. Default is <code class="docutils literal notranslate"><span class="pre">None</span></code>, which
+will be set to Uniform distribution.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="autodetect.AutogradHmm.compute_stats">
+<span class="sig-name descname"><span class="pre">compute_stats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">idx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prange</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trange</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stat_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'autograd'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#autodetect.AutogradHmm.compute_stats" title="Link to this definition"></a></dt>
+<dd><p>Compute test statistics.</p>
+<p>This function performs score-based hypothesis tests to detect the existence of a change in a hidden Markov model as it learns from
+a continuous, possibly evolving, stream of data.
+Three tests are implemented: the linear test, the scan test, and the autograd-test. The
+linear statistic is the maximum score statistic over all possible locations of
+change. The scan statistic is the maximum score statistic over all possible
+locations of change, and over all possible subsets of parameters in which change occurs.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This method will run the <code class="docutils literal notranslate"><span class="pre">filtering</span></code> method for <code class="docutils literal notranslate"><span class="pre">obs</span></code>.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>obs</strong> (<em>torch.Tensor</em>) – Observations (can be multi-dimensional).</p></li>
+<li><p><strong>alpha</strong> (<em>double</em><em> or </em><em>list</em><em>, </em><em>optional</em>) – Significance level(s). For the autograd-test it should be a list of length two,
+where the first element is the significance level for the linear statistic and
+the second is for the scan statistic. Default is 0.05.</p></li>
+<li><p><strong>idx</strong> (<em>array-like</em><em>, </em><em>optional</em>) – Indices of parameters of interest (the rest parameters are considered constants)
+in the parameter vector.
+Default is <code class="docutils literal notranslate"><span class="pre">None</span></code>, which will be set to <code class="docutils literal notranslate"><span class="pre">range(dim)</span></code>.</p></li>
+<li><p><strong>prange</strong> (<em>array-like</em><em>, </em><em>optional</em>) – Change cardinality set over which the scan statistic is maximized.
+Default is <code class="docutils literal notranslate"><span class="pre">None</span></code>,
+which will be set to <code class="docutils literal notranslate"><span class="pre">range(1,</span> <span class="pre">min([int(np.sqrt(d)),</span> <span class="pre">len(idx)])</span> <span class="pre">+</span> <span class="pre">1)</span></code>.</p></li>
+<li><p><strong>trange</strong> (<em>array-like</em><em>, </em><em>optional</em>) – Change location set over which the statistic is maximized. Default is <code class="docutils literal notranslate"><span class="pre">None</span></code>,
+which will be set to <code class="docutils literal notranslate"><span class="pre">range(int(n</span> <span class="pre">/</span> <span class="pre">10)</span> <span class="pre">+</span> <span class="pre">lag,</span> <span class="pre">int(n</span> <span class="pre">*</span> <span class="pre">9</span> <span class="pre">/</span> <span class="pre">10))</span></code>.</p></li>
+<li><p><strong>stat_type</strong> (<em>str</em><em>, </em><em>optional</em>) – Type of statistic that is computed. It can take values in <code class="docutils literal notranslate"><span class="pre">['linear',</span> <span class="pre">'scan',</span>
+<span class="pre">'autograd',</span> <span class="pre">'all']</span></code>, where <code class="docutils literal notranslate"><span class="pre">'all'</span></code> indicates calculating all of them. Default is <code class="docutils literal notranslate"><span class="pre">'autograd'</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>stat</strong> (<em>torch.Tensor</em>) – Test statistic at level <code class="docutils literal notranslate"><span class="pre">alpha</span></code>. Reject null if it is larger than 1.</p></li>
+<li><p><strong>tau</strong> (<em>int</em>) – Location of changepoint corresponds to the test statistic.</p></li>
+<li><p><strong>index</strong> (<em>array-like</em>) – Indices of parameters correspond to the test statistic. It will be omitted for the linear test.</p></li>
+</ul>
+</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>NameError</strong> – If <code class="docutils literal notranslate"><span class="pre">stat_type</span></code> is not in <code class="docutils literal notranslate"><span class="pre">['linear',</span> <span class="pre">'scan',</span> <span class="pre">'autograd',</span> <span class="pre">'all']</span></code>.</p></li>
+<li><p><strong>ValueError</strong> – If <code class="docutils literal notranslate"><span class="pre">alpha</span></code> is not an instance of <code class="docutils literal notranslate"><span class="pre">float</span></code> or <code class="docutils literal notranslate"><span class="pre">list</span></code>; or if <code class="docutils literal notranslate"><span class="pre">prange</span></code>
+    is not within <code class="docutils literal notranslate"><span class="pre">range(1,</span> <span class="pre">len(idx)+1)</span></code>; or if <code class="docutils literal notranslate"><span class="pre">trange</span></code> is not within
+    <code class="docutils literal notranslate"><span class="pre">range(lag,</span> <span class="pre">size)</span></code>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="autodetect.AutogradHmm.filtering">
+<span class="sig-name descname"><span class="pre">filtering</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#autodetect.AutogradHmm.filtering" title="Link to this definition"></a></dt>
+<dd><p>Perform normalized forward algorithm (filtering).</p>
+<p>This method implements the normalized forward algorithm for
+observations provided and stores the forward probabilities and
+normalizing constants as model attributes. See the book
+“<a class="reference external" href="http://people.bordeaux.inria.fr/pierre.delmoral/hmm-cappe-moulines-ryden.pdf">Inference in Hidden Markov Models</a>”
+for more details.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>obs</strong> (<em>torch.Tensor</em>) – Observations.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="autodetect.AutogradHmm.get_emission">
+<span class="sig-name descname"><span class="pre">get_emission</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#autodetect.AutogradHmm.get_emission" title="Link to this definition"></a></dt>
+<dd><p>Get emission parameters.</p>
+<p>If the emission distribution is discrete, returns the emission matrix;
+otherwise returns a matrix whose <span class="math notranslate nohighlight">\(k\)</span>-th row contains parameters
+of emission distribution given hidden state <span class="math notranslate nohighlight">\(k\)</span>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="autodetect.AutogradHmm.get_normalized_forward">
+<span class="sig-name descname"><span class="pre">get_normalized_forward</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#autodetect.AutogradHmm.get_normalized_forward" title="Link to this definition"></a></dt>
+<dd><p>Get normalized forward probabilities (filtering).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="autodetect.AutogradHmm.get_normalizing_constant">
+<span class="sig-name descname"><span class="pre">get_normalizing_constant</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#autodetect.AutogradHmm.get_normalizing_constant" title="Link to this definition"></a></dt>
+<dd><p>Get normalizing constants of forward quantities.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="autodetect.AutogradHmm.get_transition">
+<span class="sig-name descname"><span class="pre">get_transition</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#autodetect.AutogradHmm.get_transition" title="Link to this definition"></a></dt>
+<dd><p>Get transition matrix.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="autodetect.AutogradHmm.gradients">
+<span class="sig-name descname"><span class="pre">gradients</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#autodetect.AutogradHmm.gradients" title="Link to this definition"></a></dt>
+<dd><p>Get gradients of model parameters.</p>
+<p>Returns an 1D <code class="docutils literal notranslate"><span class="pre">Tensor</span></code> contains the gradient of parameters.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="autodetect.AutogradHmm.information">
+<span class="sig-name descname"><span class="pre">information</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filtered</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#autodetect.AutogradHmm.information" title="Link to this definition"></a></dt>
+<dd><p>Compute score and information matrix.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>obs</strong> (<em>torch.Tensor</em>) – Observations.</p></li>
+<li><p><strong>filtered</strong> (<em>bool</em><em>, </em><em>optional</em>) – Indicates if the method <code class="docutils literal notranslate"><span class="pre">filtering</span></code> has been called for <code class="docutils literal notranslate"><span class="pre">obs</span></code>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="autodetect.AutogradHmm.information_emission">
+<span class="sig-name descname"><span class="pre">information_emission</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">states</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#autodetect.AutogradHmm.information_emission" title="Link to this definition"></a></dt>
+<dd><p>Compute score and information for the emission distribution.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>obs</strong> (<em>torch.Tensor</em>) – Observations.</p></li>
+<li><p><strong>states</strong> (<em>array-like</em><em> (</em><em>integer</em><em>)</em>) – Hidden states associated with <code class="docutils literal notranslate"><span class="pre">obs</span></code>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="autodetect.AutogradHmm.log_likelihood">
+<span class="sig-name descname"><span class="pre">log_likelihood</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filtered</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#autodetect.AutogradHmm.log_likelihood" title="Link to this definition"></a></dt>
+<dd><p>Compute log-likelihood.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>obs</strong> (<em>torch.Tensor</em>) – Observations.</p></li>
+<li><p><strong>filtered</strong> (<em>bool</em><em>, </em><em>optional</em>) – Indicates if the method <code class="docutils literal notranslate"><span class="pre">filtering</span></code> has been called for <code class="docutils literal notranslate"><span class="pre">obs</span></code>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="autodetect.AutogradHmm.loglike_emission">
+<span class="sig-name descname"><span class="pre">loglike_emission</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">states</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#autodetect.AutogradHmm.loglike_emission" title="Link to this definition"></a></dt>
+<dd><p>Compute log-likelihood for the emission distribution.</p>
+<p>Should be overridden by all subclasses. Use the method <code class="docutils literal notranslate"><span class="pre">get_emission</span></code>
+to get emission parameters.</p>
+<p>It should at least support a single observation and associated hidden state.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>obs</strong> (<em>torch.Tensor</em>) – Observations.</p></li>
+<li><p><strong>states</strong> (<em>array-like</em><em> (</em><em>integer</em><em>)</em>) – Hidden states associated with <code class="docutils literal notranslate"><span class="pre">obs</span></code>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="autodetect.AutogradHmm.parameters">
+<span class="sig-name descname"><span class="pre">parameters</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#autodetect.AutogradHmm.parameters" title="Link to this definition"></a></dt>
+<dd><p>Get model parameters.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="autodetect.AutogradHmm.setup">
+<span class="sig-name descname"><span class="pre">setup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tran</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">emis</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">discrete</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">true_train</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">true_emis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#autodetect.AutogradHmm.setup" title="Link to this definition"></a></dt>
+<dd><p>Set up the model.</p>
+<p>This method constructs the HMM based on the transition parameters and
+emission parameters provided. You should indicate if they are true
+values or estimates (unknown). True values will not be considered as
+model parameters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tran</strong> (<em>array-like</em><em>, </em><em>shape</em><em> (</em><em>n_states</em><em>, </em><em>n_states</em><em>)</em>) – Transition matrix.</p></li>
+<li><p><strong>emis</strong> (array-like, shape (n_states, <a href="#id2"><span class="problematic" id="id3">*</span></a>)) – Emission parameters. If emission distribution is discrete, it
+should be emission matrix; otherwise it is a matrix whose
+<span class="math notranslate nohighlight">\(k\)</span>-th row contains parameters of emission distribution
+given hidden state <span class="math notranslate nohighlight">\(k\)</span>.</p></li>
+<li><p><strong>discrete</strong> (<em>bool</em>) – Indicates if emission distribution is discrete.</p></li>
+<li><p><strong>true_train</strong> (<em>bool</em><em>, </em><em>optional</em>) – Indicates if the transition matrix provided is the true value or
+estimate from data. Default is <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
+<li><p><strong>true_emis</strong> (<em>bool</em><em>, </em><em>optional</em>) – Indicates if the emission parameters provided are true values or
+estimates from data. Default is <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="autodetect.AutogradHmm.write_emission">
+<span class="sig-name descname"><span class="pre">write_emission</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">emis</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">discrete</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">requires_grad</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#autodetect.AutogradHmm.write_emission" title="Link to this definition"></a></dt>
+<dd><p>Write emission parameters of the model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>emis</strong> (array-like, shape (n_states, <a href="#id4"><span class="problematic" id="id5">*</span></a>)) – Emission parameters. Its <span class="math notranslate nohighlight">\(k\)</span>-th row contains parameters of emission distribution given hidden state <span class="math notranslate nohighlight">\(k\)</span>.</p></li>
+<li><p><strong>discrete</strong> (<em>bool</em>) – Indicates if the emission distribution is discrete.</p></li>
+<li><p><strong>requires_grad</strong> (<em>bool</em><em>, </em><em>optional</em>) – Gradient status of the emission parameters (set to <code class="docutils literal notranslate"><span class="pre">False</span></code> if
+true values are known and provided). Default is <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="autodetect.AutogradHmm.write_transition">
+<span class="sig-name descname"><span class="pre">write_transition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tran</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">requires_grad</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#autodetect.AutogradHmm.write_transition" title="Link to this definition"></a></dt>
+<dd><p>Write transition parameters of the model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tran</strong> (<em>array-like</em><em>, </em><em>shape</em><em> (</em><em>n_states</em><em>, </em><em>n_states</em><em>)</em>) – Transition matrix (<code class="docutils literal notranslate"><span class="pre">tran[i,</span> <span class="pre">j]</span></code> is the conditional probability
+<span class="math notranslate nohighlight">\(p(j|i)\)</span>).</p></li>
+<li><p><strong>requires_grad</strong> (<em>bool</em><em>, </em><em>optional</em>) – Gradient status of the transition parameters (set to <code class="docutils literal notranslate"><span class="pre">False</span></code> if
+true values are known and provided). Default is <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="autodetect.AutogradHmm.zero_grad">
+<span class="sig-name descname"><span class="pre">zero_grad</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#autodetect.AutogradHmm.zero_grad" title="Link to this definition"></a></dt>
+<dd><p>Set gradients of the model to zero.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="simple.html" class="btn btn-neutral float-left" title="Simple Models" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="time.html" class="btn btn-neutral float-right" title="Time Series Models" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2019, Lang Liu, Joseph Salmon, and Zaid Harchaoui..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

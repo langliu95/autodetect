@@ -1,0 +1,211 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Autodetect &mdash; autodetect  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Getting Started" href="start.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="#" class="icon icon-home">
+            autodetect
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="start.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API Summary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="simple.html">Simple Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="latent.html">Latent Variable Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="time.html">Time Series Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="topic.html">Text Topic Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="autocusum.html">Online Change Detection</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="#">autodetect</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="#" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Autodetect</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="autodetect">
+<h1>Autodetect<a class="headerlink" href="#autodetect" title="Link to this heading"></a></h1>
+<p><code class="xref py py-class docutils literal notranslate"><span class="pre">Autodetect</span></code> is a package for a score-based change detection method, <em>autograd-test</em>, that can automatically report hidden changes in machine learning systems as they learn from a continuous, possibly evolving, stream of data.
+This is code accompanying the paper “<a class="reference external" href="https://stat.uw.edu/sites/default/files/2019-07/tr652.pdf">Score-based Change Detection for Gradient-based Learning Machines</a>”.
+The package is licensed under the GPLv3 license.</p>
+<section id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Link to this heading"></a></h2>
+<p>Given observations <span class="math notranslate nohighlight">\(X_1, \dots, X_n\)</span> and an underlying probability distribution <span class="math notranslate nohighlight">\(p_\theta\)</span>
+in which <span class="math notranslate nohighlight">\(\theta \in \mathbb{R}^d\)</span>, this approach detects the existence of a change in
+<span class="math notranslate nohighlight">\(\theta\)</span> through hypothesis testing:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}H_0:\ &amp;X_1, \dots, X_n \sim p_\theta \\
+H_1:\ &amp;\exists \tau \in \{1, \ldots, n-1\} \text{ and } \Delta \neq 0 \\
+&amp;s.t.\ X_1, \dots, X_\tau \sim p_\theta \text{ and } X_{\tau+1}, \dots, X_n \sim p_{\theta + \Delta}.\end{split}\]</div>
+<p>The autograd-test statistic consists of two building blocks—the <em>linear statistic</em> and the <em>scan statistic</em>.
+The scan statistic is especially effective in detecting a <em>sparse change</em>, that is, a change that occurs at a small subset of model parameters;
+while the linear statistic is more powerful when the change is less sparse.
+Both of them are based on the <a class="reference external" href="https://en.wikipedia.org/wiki/Score_test">score statistic</a>, which involves first derivatives (score function) and second derivatives
+(observed information matrix) of the log-likelihood function of <span class="math notranslate nohighlight">\(\Delta\)</span> under null
+hypothesis with the maximum likelihood estimator (MLE) of <span class="math notranslate nohighlight">\(\theta\)</span> plugged in.</p>
+<p>This approach also supports detecting changes in a subset of parameters.
+For example, one can limit the detection to AR parameters if changes in MA parameters are of no interest for a <a class="reference external" href="https://en.wikipedia.org/wiki/Autoregressive%E2%80%93moving-average_model">autoregressive–moving-average (ARMA)</a> model.</p>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="start.html">Getting Started</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="start.html#prerequisites">Prerequisites</a></li>
+<li class="toctree-l2"><a class="reference internal" href="start.html#installation">Installation</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API Summary</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api.html#observable-variable-model">Observable variable model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#latent-variable-model">Latent variable model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#time-series-model">Time series model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#text-topic-model">Text topic model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#data">Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#utils">Utils</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="simple.html">Simple Models</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="simple.html#change-in-mean">Change in mean</a></li>
+<li class="toctree-l2"><a class="reference internal" href="simple.html#change-in-coefficients">Change in coefficients</a></li>
+<li class="toctree-l2"><a class="reference internal" href="simple.html#api-reference">API reference</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="latent.html">Latent Variable Models</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="latent.html#hidden-markov-models">Hidden Markov models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="latent.html#api-reference">API reference</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="time.html">Time Series Models</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="time.html#autoregressive-moving-average-models">Autoregressive–moving-average models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="time.html#api-reference">API reference</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="topic.html">Text Topic Models</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="topic.html#data-description">Data description</a></li>
+<li class="toctree-l2"><a class="reference internal" href="topic.html#change-detection-in-language-level">Change detection in language level</a></li>
+<li class="toctree-l2"><a class="reference internal" href="topic.html#api-reference">API reference</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="autocusum.html">Online Change Detection</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="autocusum.html#autograd-test-cusum">Autograd-test-CuSum</a></li>
+<li class="toctree-l2"><a class="reference internal" href="autocusum.html#api-reference">API reference</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+</section>
+<section id="authors">
+<h1>Authors<a class="headerlink" href="#authors" title="Link to this heading"></a></h1>
+<ul class="simple">
+<li><p>Lang Liu</p></li>
+<li><p><a class="reference external" href="http://josephsalmon.eu/">Joseph Salmon</a></p></li>
+<li><p><a class="reference external" href="http://faculty.washington.edu/zaid/">Zaid Harchaoui</a></p></li>
+</ul>
+</section>
+<section id="cite">
+<h1>Cite<a class="headerlink" href="#cite" title="Link to this heading"></a></h1>
+<p>If you use this code, please cite:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nd">@inproceedings</span><span class="p">{</span><span class="n">lsh2021</span><span class="p">,</span>
+<span class="n">title</span> <span class="o">=</span> <span class="p">{</span><span class="n">Score</span><span class="o">-</span><span class="n">Based</span> <span class="n">Change</span> <span class="n">Detection</span> <span class="k">for</span> <span class="n">Gradient</span><span class="o">-</span><span class="n">Based</span> <span class="n">Learning</span> <span class="n">Machines</span><span class="p">},</span>
+<span class="n">author</span> <span class="o">=</span> <span class="p">{</span><span class="n">Liu</span><span class="p">,</span> <span class="n">Lang</span> <span class="ow">and</span>
+          <span class="n">Salmon</span><span class="p">,</span> <span class="n">Joseph</span> <span class="ow">and</span>
+          <span class="n">Harchaoui</span><span class="p">,</span> <span class="n">Zaid</span><span class="p">},</span>
+<span class="n">booktitle</span> <span class="o">=</span> <span class="p">{</span><span class="mi">2021</span> <span class="p">{</span><span class="n">IEEE</span><span class="p">}</span> <span class="n">International</span> <span class="n">Conference</span> <span class="n">on</span> <span class="n">Acoustics</span><span class="p">,</span> <span class="n">Speech</span> <span class="ow">and</span> <span class="n">Signal</span> <span class="n">Processing</span><span class="p">,</span> <span class="p">{</span><span class="n">ICASSP</span><span class="p">}</span> <span class="mi">2021</span><span class="p">,</span> <span class="n">Toronto</span><span class="p">,</span> <span class="n">Canada</span><span class="p">,</span> <span class="n">June</span> <span class="mi">6</span><span class="o">-</span><span class="mi">11</span><span class="p">,</span> <span class="mi">2021</span><span class="p">},</span>
+<span class="n">publisher</span> <span class="o">=</span> <span class="p">{{</span><span class="n">IEEE</span><span class="p">}},</span>
+<span class="n">year</span> <span class="o">=</span> <span class="p">{</span><span class="mi">2021</span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<section id="acknowledgments">
+<h2>Acknowledgments<a class="headerlink" href="#acknowledgments" title="Link to this heading"></a></h2>
+<p>This work was supported by NSF CCF-1740551, NSF DMS-1810975, the program “Learning in
+Machines and Brains” of CIFAR, and faculty research awards.</p>
+<p><a class="reference external" href="http://ads-institute.uw.edu/"><img alt="adsi" src="fig/ADSI.png" style="width: 25%;" /></a>    <a class="reference external" href="https://nsf.gov/"><img alt="nsf" src="fig/NSF.png" style="width: 11%;" /></a>
+<a class="reference external" href="https://escience.washington.edu/"><img alt="esci" src="fig/escience.png" style="width: 40%;" /></a>      <a class="reference external" href="https://www.cifar.ca/"><img alt="cifar" src="fig/CIFAR.png" style="width: 15%;" /></a></p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="start.html" class="btn btn-neutral float-right" title="Getting Started" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2019, Lang Liu, Joseph Salmon, and Zaid Harchaoui..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,472 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Simple Models &mdash; autodetect  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Latent Variable Models" href="latent.html" />
+    <link rel="prev" title="API Summary" href="api.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            autodetect
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="start.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API Summary</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Simple Models</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#change-in-mean">Change in mean</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#change-in-coefficients">Change in coefficients</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#api-reference">API reference</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#autodetect.information"><code class="docutils literal notranslate"><span class="pre">information()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#autodetect.autograd_test"><code class="docutils literal notranslate"><span class="pre">autograd_test()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#autodetect.AutogradTest"><code class="docutils literal notranslate"><span class="pre">AutogradTest</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#autodetect.AutogradTest.compute_stats"><code class="docutils literal notranslate"><span class="pre">AutogradTest.compute_stats()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#autodetect.AutogradTest.gradients"><code class="docutils literal notranslate"><span class="pre">AutogradTest.gradients()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#autodetect.AutogradTest.information"><code class="docutils literal notranslate"><span class="pre">AutogradTest.information()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#autodetect.AutogradTest.inv_info_vec_prod"><code class="docutils literal notranslate"><span class="pre">AutogradTest.inv_info_vec_prod()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#autodetect.AutogradTest.log_likelihood"><code class="docutils literal notranslate"><span class="pre">AutogradTest.log_likelihood()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#autodetect.AutogradTest.score_func"><code class="docutils literal notranslate"><span class="pre">AutogradTest.score_func()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#autodetect.AutogradTest.vec_info_prod"><code class="docutils literal notranslate"><span class="pre">AutogradTest.vec_info_prod()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#autodetect.AutogradTest.zero_grad"><code class="docutils literal notranslate"><span class="pre">AutogradTest.zero_grad()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="latent.html">Latent Variable Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="time.html">Time Series Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="topic.html">Text Topic Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="autocusum.html">Online Change Detection</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">autodetect</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Simple Models</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/simple.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="simple-models">
+<h1>Simple Models<a class="headerlink" href="#simple-models" title="Link to this heading"></a></h1>
+<p>In this section we give two examples to show how to apply the autograd-test to detect changepoint in models where all variables are directly observable.
+The log-likelihood function can be computed straightforwardly for such models,
+which allows an efficient calculation of first derivatives (score function) and
+second derivatives (observed information matrix) of the log-likelihood.
+These derivatives are computed using the module <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.autograd</span></code>,
+so a log-likelihood function (or at least up to an additive constant) implemented in <code class="xref py py-class docutils literal notranslate"><span class="pre">PyTorch</span></code> needs to be provided.
+Then you may call the function <code class="docutils literal notranslate"><span class="pre">information</span></code> to compute the score function and observed information matrix
+at given values of model parameters.</p>
+<p>To detect changes in model parameters, the maximum likelihood estimator (MLE) of parameters
+under null hypothesis (no change exists) is required.
+Once you have the MLE, you can call the function <code class="docutils literal notranslate"><span class="pre">autograd_test</span></code> to obtain the test statistic at given significance level,
+as well as the location and components of parameters associated with it, that is, the most possible location and components of parameters where the change occurs.
+If this statistic is larger than 1, the null hypothesis is rejected,
+suggesting it is very likely that there is an abnormal change in your model parameters.</p>
+<section id="change-in-mean">
+<h2>Change in mean<a class="headerlink" href="#change-in-mean" title="Link to this heading"></a></h2>
+<p>Here is an example on how to apply this package to detect a changepoint in the mean of a Gaussian model.
+To begin with, let’s generate some independent multivariate Gaussian random vectors with a sparse change in mean:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch.distributions.normal</span><span class="w"> </span><span class="kn">import</span> <span class="n">Normal</span>
+<span class="n">n</span><span class="p">,</span> <span class="n">d</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">,</span> <span class="mi">100</span>
+<span class="n">tau0</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">n</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>  <span class="c1"># location of the change</span>
+<span class="n">theta</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>  <span class="c1"># mean before change</span>
+<span class="n">delta</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+<span class="n">delta</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.5</span>  <span class="c1"># only the first component changes</span>
+<span class="n">gen</span> <span class="o">=</span> <span class="n">Normal</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">d</span><span class="p">))</span>
+<span class="n">obs</span> <span class="o">=</span> <span class="n">gen</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">Size</span><span class="p">([</span><span class="n">n</span><span class="p">]))</span>
+<span class="n">obs</span><span class="p">[</span><span class="n">tau0</span><span class="p">:]</span> <span class="o">+=</span> <span class="n">delta</span>
+</pre></div>
+</div>
+<p>For simplicity, we assume that the covariance matrix is known to be identity matrix.
+Then the log-likelihood function (up to a constant) of this model can be defined as</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">loglike</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">obs</span><span class="p">):</span>
+    <span class="k">return</span> <span class="o">-</span><span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">obs</span> <span class="o">-</span> <span class="n">theta</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="p">:])</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
+</pre></div>
+</div>
+<p>And the MLE of mean under null hypothesis (no change exists) is</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">theta_hat</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">obs</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Now we can derive the test statistic at significance level 0.05.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">autodetect</span><span class="w"> </span><span class="kn">import</span> <span class="n">autograd_test</span>
+<span class="n">stat</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="n">index</span> <span class="o">=</span> <span class="n">autograd_test</span><span class="p">(</span><span class="n">theta_hat</span><span class="p">,</span> <span class="n">obs</span><span class="p">,</span> <span class="n">loglike</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>If <code class="docutils literal notranslate"><span class="pre">stat</span></code> is larger than 1, we reject the null hypothesis.
+Moreover, <code class="docutils literal notranslate"><span class="pre">tau</span></code> and <code class="docutils literal notranslate"><span class="pre">index</span></code> are the location and components of
+parameters associated with this test statistic, respectively.</p>
+</section>
+<section id="change-in-coefficients">
+<h2>Change in coefficients<a class="headerlink" href="#change-in-coefficients" title="Link to this heading"></a></h2>
+<p>For models inherited from <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.Module</span></code>, you can utilize the
+specifically designed class <code class="xref py py-class docutils literal notranslate"><span class="pre">AutogradTest</span></code>.
+For illustration purpose, we consider linear regression.
+Firstly, let’s generate some linearly correlated observations with change in coefficients:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="n">n</span><span class="p">,</span> <span class="n">d</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">,</span> <span class="mi">4</span>
+<span class="n">tau0</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">n</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+<span class="n">inputs</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">((</span><span class="n">n</span><span class="p">,</span> <span class="n">d</span><span class="p">))</span>
+<span class="n">theta</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+<span class="n">delta</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+<span class="n">targets</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="n">theta</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">torch</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">mean</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">std</span><span class="o">=</span><span class="mf">0.1</span><span class="o">*</span><span class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">n</span><span class="p">))</span>
+<span class="c1"># change in coefficients, not in intercept</span>
+<span class="n">targets</span><span class="p">[</span><span class="n">tau0</span><span class="p">:]</span> <span class="o">+=</span> <span class="n">torch</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">inputs</span><span class="p">[</span><span class="n">tau0</span><span class="p">:],</span> <span class="n">delta</span><span class="p">)</span>
+<span class="n">targets</span> <span class="o">=</span> <span class="n">targets</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Next we define a linear model as a neural network and its
+log-likelihood function (up to a constant).</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">torch.nn</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">nn</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Linear</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Linear regression as neural network&quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">in_dim</span><span class="p">,</span> <span class="n">out_dim</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Linear</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fc</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">in_dim</span><span class="p">,</span> <span class="n">out_dim</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">):</span>
+        <span class="n">inputs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fc</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">inputs</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">loglike</span><span class="p">(</span><span class="n">outs</span><span class="p">,</span> <span class="n">targets</span><span class="p">):</span>
+    <span class="n">loss_fn</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">MSELoss</span><span class="p">(</span><span class="n">reduction</span><span class="o">=</span><span class="s1">&#39;sum&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="o">-</span><span class="n">loss_fn</span><span class="p">(</span><span class="n">outs</span><span class="p">,</span> <span class="n">targets</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
+</pre></div>
+</div>
+<p>We then train the model with the loss function being negative log-likelihood.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">linear</span> <span class="o">=</span> <span class="n">Linear</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">optim</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="n">linear</span><span class="o">.</span><span class="n">parameters</span><span class="p">())</span>
+<span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10000</span><span class="p">):</span>
+    <span class="n">optim</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
+    <span class="n">outs</span> <span class="o">=</span> <span class="n">linear</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span>
+    <span class="n">loss</span> <span class="o">=</span> <span class="o">-</span><span class="n">loglike</span><span class="p">(</span><span class="n">outs</span><span class="p">,</span> <span class="n">targets</span><span class="p">)</span>
+    <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
+    <span class="n">optim</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Finally, we derive the autograd-test statistic at significance level 0.05.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">autodetect</span><span class="w"> </span><span class="kn">import</span> <span class="n">AutogradTest</span>
+<span class="n">lin_autograd</span> <span class="o">=</span> <span class="n">AutogradTest</span><span class="p">(</span><span class="n">linear</span><span class="p">,</span> <span class="n">loglike</span><span class="p">)</span>
+<span class="n">stat</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="n">index</span> <span class="o">=</span> <span class="n">lin_autograd</span><span class="o">.</span><span class="n">compute_stats</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="n">targets</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Further, if change in intercept is of no interest, you can limit the
+detection to coefficients:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">stat</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="n">index</span> <span class="o">=</span> <span class="n">lin_autograd</span><span class="o">.</span><span class="n">compute_stats</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="n">targets</span><span class="p">,</span> <span class="n">idx</span><span class="o">=</span><span class="nb">range</span><span class="p">(</span><span class="n">d</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Since slope coefficients come first in <code class="docutils literal notranslate"><span class="pre">linear.parameters()</span></code>, the indices for slope coefficients are <span class="math notranslate nohighlight">\(0, \dots, d-1\)</span>.</p>
+</div>
+</section>
+<section id="api-reference">
+<h2>API reference<a class="headerlink" href="#api-reference" title="Link to this heading"></a></h2>
+<p>For stand-alone models:</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="autodetect.information">
+<span class="sig-prename descclassname"><span class="pre">autodetect.</span></span><span class="sig-name descname"><span class="pre">information</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">theta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loglike</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ident</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#autodetect.information" title="Link to this definition"></a></dt>
+<dd><p>Compute score function and information matrix.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>theta</strong> (<em>torch.Tensor</em><em>, </em><em>shape</em><em> (</em><em>dim</em><em>,</em><em>)</em>) – Values of parameters at which score and information are computed.</p></li>
+<li><p><strong>obs</strong> (<em>torch.Tensor</em><em>, </em><em>shape</em><em> (</em><em>size</em><em>, </em><em>dim</em><em>)</em>) – Observations.</p></li>
+<li><p><strong>loglike</strong> (<em>function</em>) – <code class="docutils literal notranslate"><span class="pre">loglike(theta,</span> <span class="pre">obs)</span></code> is the log-likelihood of <code class="docutils literal notranslate"><span class="pre">theta</span></code> given <code class="docutils literal notranslate"><span class="pre">obs</span></code>.</p></li>
+<li><p><strong>ident</strong> (<em>torch.Tensor</em><em>, </em><em>shape</em><em> (</em><em>dim</em><em>, </em><em>dim</em><em>)</em><em>, </em><em>optional</em>) – Identity matrix. Default is <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="autodetect.autograd_test">
+<span class="sig-prename descclassname"><span class="pre">autodetect.</span></span><span class="sig-name descname"><span class="pre">autograd_test</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">theta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loglike</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lag</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">idx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prange</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trange</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stat_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'autograd'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#autodetect.autograd_test" title="Link to this definition"></a></dt>
+<dd><p>Compute autograd-test statistics.</p>
+<p>This function performs score-based hypothesis tests to detect the existence of
+a change in machine learning systems as they learn from
+a continuous, possibly evolving, stream of data.
+Three tests are implemented: the linear test, the scan test, and the autograd-test. The
+linear statistic is the maximum score statistic over all possible locations of
+change. The scan statistic is the maximum score statistic over all possible
+locations of change, and over all possible subsets of parameters in which change occurs.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The log-likelihood function <code class="docutils literal notranslate"><span class="pre">loglike</span></code> needs to be implemented in
+<code class="xref py py-class docutils literal notranslate"><span class="pre">PyTorch</span></code>.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>theta</strong> (<em>torch.Tensor</em><em>, </em><em>shape</em><em> (</em><em>dim</em><em>,</em><em>)</em>) – Maximum likelihood estimator of model parameters under null hypothesis
+(no change exists).</p></li>
+<li><p><strong>obs</strong> (<em>torch.Tensor</em><em>, </em><em>shape</em><em> (</em><em>size</em><em>, </em><em>dim</em><em>)</em>) – Observations.</p></li>
+<li><p><strong>loglike</strong> (<em>function</em>) – <code class="docutils literal notranslate"><span class="pre">loglike(theta,</span> <span class="pre">obs)</span></code> is the log-likelihood of <code class="docutils literal notranslate"><span class="pre">theta</span></code> given <code class="docutils literal notranslate"><span class="pre">obs</span></code>.</p></li>
+<li><p><strong>alpha</strong> (<em>double</em><em> or </em><em>list</em><em>, </em><em>optional</em>) – Significance level(s). For the autograd-test it should be a list of length two,
+where the first element is the significance level for the linear statistic and
+the second is for the scan statistic. Default is 0.05.</p></li>
+<li><p><strong>lag</strong> (<em>int</em><em>, </em><em>optional</em>) – Order of Markovian dependency. The distribution of <code class="docutils literal notranslate"><span class="pre">obs[k]</span></code> only
+depends on <code class="docutils literal notranslate"><span class="pre">obs[(k-lag):k]</span></code>. Use <code class="docutils literal notranslate"><span class="pre">None</span></code> to represent
+non-Markovian dependency. Default is 0.</p></li>
+<li><p><strong>idx</strong> (<em>array-like</em><em>, </em><em>optional</em>) – Indices of parameters of interest (the rest parameters are considered constants)
+in the parameter vector.
+Default is <code class="docutils literal notranslate"><span class="pre">None</span></code>, which will be set to <code class="docutils literal notranslate"><span class="pre">range(dim)</span></code>.</p></li>
+<li><p><strong>prange</strong> (<em>array-like</em><em>, </em><em>optional</em>) – Change cardinality set over which the scan statistic is maximized.
+Default is <code class="docutils literal notranslate"><span class="pre">None</span></code>,
+which will be set to <code class="docutils literal notranslate"><span class="pre">range(1,</span> <span class="pre">min([int(np.sqrt(d)),</span> <span class="pre">len(idx)])</span> <span class="pre">+</span> <span class="pre">1)</span></code>.</p></li>
+<li><p><strong>trange</strong> (<em>array-like</em><em>, </em><em>optional</em>) – Change location set over which the statistic is maximized. Default is <code class="docutils literal notranslate"><span class="pre">None</span></code>,
+which will be set to <code class="docutils literal notranslate"><span class="pre">range(int(n</span> <span class="pre">/</span> <span class="pre">10)</span> <span class="pre">+</span> <span class="pre">lag,</span> <span class="pre">int(n</span> <span class="pre">*</span> <span class="pre">9</span> <span class="pre">/</span> <span class="pre">10))</span></code>.</p></li>
+<li><p><strong>stat_type</strong> (<em>str</em><em>, </em><em>optional</em>) – Type of statistic that is computed. It can take values in <code class="docutils literal notranslate"><span class="pre">['linear',</span> <span class="pre">'scan',</span>
+<span class="pre">'autograd',</span> <span class="pre">'all']</span></code>, where <code class="docutils literal notranslate"><span class="pre">'all'</span></code> indicates calculating all of them. Default is <code class="docutils literal notranslate"><span class="pre">'autograd'</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>stat</strong> (<em>torch.Tensor</em>) – Test statistic at level <code class="docutils literal notranslate"><span class="pre">alpha</span></code>. Reject null if it is larger than 1.</p></li>
+<li><p><strong>tau</strong> (<em>int</em>) – Location of changepoint corresponds to the test statistic.</p></li>
+<li><p><strong>index</strong> (<em>array-like</em>) – Indices of parameters correspond to the test statistic. It will be omitted for the linear test.</p></li>
+</ul>
+</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>NameError</strong> – If <code class="docutils literal notranslate"><span class="pre">stat_type</span></code> is not in <code class="docutils literal notranslate"><span class="pre">['linear',</span> <span class="pre">'scan',</span> <span class="pre">'autograd',</span> <span class="pre">'all']</span></code>.</p></li>
+<li><p><strong>ValueError</strong> – If <code class="docutils literal notranslate"><span class="pre">alpha</span></code> is not an instance of <code class="docutils literal notranslate"><span class="pre">float</span></code> or <code class="docutils literal notranslate"><span class="pre">list</span></code>; or if <code class="docutils literal notranslate"><span class="pre">prange</span></code>
+    is not within <code class="docutils literal notranslate"><span class="pre">range(1,</span> <span class="pre">len(idx)+1)</span></code>; or if <code class="docutils literal notranslate"><span class="pre">trange</span></code> is not within
+    <code class="docutils literal notranslate"><span class="pre">range(lag,</span> <span class="pre">size)</span></code>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<p>For models inherited from <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.Module</span></code>:</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="autodetect.AutogradTest">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">autodetect.</span></span><span class="sig-name descname"><span class="pre">AutogradTest</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pretrained_model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loglike</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#autodetect.AutogradTest" title="Link to this definition"></a></dt>
+<dd><p>A class for autograd-test for models inherited from <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.Module</span></code>.</p>
+<p>Define and train your model using <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.Module</span></code>
+before calling this class.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This class treats all model parameters as a single parameter vector to
+compute derivatives of the log-likelihood function.
+This parameter vector is obtained by iterating over parameters of your
+pre-trained model and reshaping each of them to a vector by row.</p>
+<p>The log-likelihood function is closely related to loss function in
+machine learning literature. Negative log-likelihood functions can be
+used as loss functions; while some loss functions have corresponding
+log-likelihood functions (such as mean square error versus
+log-likelihood of Gaussian).</p>
+<p>For latent variable models, computing the score and information may be
+time-consuming. In that case you should consider implementing the
+calculation using specifically designed algorithms (see, for instance, the
+class <a class="reference internal" href="latent.html#autodetect.AutogradHmm" title="autodetect.AutogradHmm"><code class="xref py py-class docutils literal notranslate"><span class="pre">AutogradHmm</span></code></a>).</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pretrained_model</strong> (<em>torch.nn.Module</em>) – A pre-trained model inherited from <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.Module</span></code>.</p></li>
+<li><p><strong>loglike</strong> (<em>function</em>) – <code class="docutils literal notranslate"><span class="pre">loglike(outputs,</span> <span class="pre">targets)</span></code> is the log-likelihood of model parameters
+given <code class="docutils literal notranslate"><span class="pre">outputs</span></code> and <code class="docutils literal notranslate"><span class="pre">targets</span></code>.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="autodetect.AutogradTest.compute_stats">
+<span class="sig-name descname"><span class="pre">compute_stats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inputs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">targets</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lag</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">idx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prange</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trange</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stat_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'autograd'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">computation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'standard'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalization</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'schur'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">accuracy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-07</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#autodetect.AutogradTest.compute_stats" title="Link to this definition"></a></dt>
+<dd><p>Compute test statistics.</p>
+<p>This function performs score-based hypothesis tests to detect the
+existence of a change in machine learning systems as they learn from
+a continuous, possibly evolving, stream of data.
+Three tests are implemented: the linear test, the scan test, and the autograd-test. The
+linear statistic is the maximum score statistic over all possible locations of
+change. The scan statistic is the maximum score statistic over all possible
+locations of change, and over all possible subsets of parameters in which change occurs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>inputs</strong> (<em>torch.Tensor</em><em>, </em><em>shape</em><em> (</em><em>size</em><em>, </em><em>dim</em><em>)</em>)</p></li>
+<li><p><strong>targets</strong> (<em>torch.Tensor</em><em>, </em><em>shape</em><em> (</em><em>size</em><em>, </em><em>*</em><em>)</em>)</p></li>
+<li><p><strong>alpha</strong> (<em>double</em><em> or </em><em>list</em><em>, </em><em>optional</em>) – Significance level(s). For the autograd-test it should be a list of length two,
+where the first element is the significance level for the linear statistic and
+the second is for the scan statistic. Default is 0.05.</p></li>
+<li><p><strong>lag</strong> (<em>int</em><em>, </em><em>optional</em>) – Order of Markovian dependency. The distribution of <code class="docutils literal notranslate"><span class="pre">obs[k]</span></code> only
+depends on <code class="docutils literal notranslate"><span class="pre">obs[(k-lag):k]</span></code>. Use <code class="docutils literal notranslate"><span class="pre">None</span></code> to represent
+non-Markovian dependency. Default is 0.</p></li>
+<li><p><strong>idx</strong> (<em>array-like</em><em>, </em><em>optional</em>) – Indices of parameters of interest (the rest parameters are considered constants)
+in the parameter vector.
+Default is <code class="docutils literal notranslate"><span class="pre">None</span></code>, which will be set to <code class="docutils literal notranslate"><span class="pre">range(dim)</span></code>.</p></li>
+<li><p><strong>prange</strong> (<em>array-like</em><em>, </em><em>optional</em>) – Change cardinality set over which the scan statistic is maximized.
+Default is <code class="docutils literal notranslate"><span class="pre">None</span></code>,
+which will be set to <code class="docutils literal notranslate"><span class="pre">range(1,</span> <span class="pre">min([int(np.sqrt(d)),</span> <span class="pre">len(idx)])</span> <span class="pre">+</span> <span class="pre">1)</span></code>.</p></li>
+<li><p><strong>trange</strong> (<em>array-like</em><em>, </em><em>optional</em>) – Change location set over which the statistic is maximized. Default is <code class="docutils literal notranslate"><span class="pre">None</span></code>,
+which will be set to <code class="docutils literal notranslate"><span class="pre">range(int(n</span> <span class="pre">/</span> <span class="pre">10)</span> <span class="pre">+</span> <span class="pre">lag,</span> <span class="pre">int(n</span> <span class="pre">*</span> <span class="pre">9</span> <span class="pre">/</span> <span class="pre">10))</span></code>.</p></li>
+<li><p><strong>stat_type</strong> (<em>str</em><em>, </em><em>optional</em>) – Type of statistic that is computed. It can take values in <code class="docutils literal notranslate"><span class="pre">['linear',</span> <span class="pre">'scan',</span>
+<span class="pre">'autograd',</span> <span class="pre">'all']</span></code>, where <code class="docutils literal notranslate"><span class="pre">'all'</span></code> indicates calculating all of them. Default is <code class="docutils literal notranslate"><span class="pre">'autograd'</span></code>.</p></li>
+<li><p><strong>computation</strong> (<em>str</em><em>, </em><em>optional</em>) – Strategy to compute the test statistic. If <code class="docutils literal notranslate"><span class="pre">'conjugate'</span></code>, then use
+the conjugate gradient algorithm to compute inverse-Hessian-vector
+product; if <code class="docutils literal notranslate"><span class="pre">'standard'</span></code>, then use the full Fisher information to
+compute the statistic. We recommend <code class="docutils literal notranslate"><span class="pre">'standard'</span></code> if data are
+independent and <code class="docutils literal notranslate"><span class="pre">'conjugate'</span></code> otherwise. Default is <code class="docutils literal notranslate"><span class="pre">'standard'</span></code>.</p></li>
+<li><p><strong>normalization</strong> (<em>str</em><em>, </em><em>optional</em>) – Normalization matrix. If <code class="docutils literal notranslate"><span class="pre">'schur'</span></code>, then use the Schur complement
+as the normalization matrix; if <code class="docutils literal notranslate"><span class="pre">'additive'</span></code>, then use
+<span class="math notranslate nohighlight">\(I_{1:\tau}^{-1} + I_{\tau+1:n}^{-1}\)</span>. Default is <code class="docutils literal notranslate"><span class="pre">'schur'</span></code>.</p></li>
+<li><p><strong>max_iter</strong> (<em>int</em><em>, </em><em>optional</em>) – Maximum number of iterations in the conjugate gradient algorithm.
+Default is <cite>None</cite>, which will be set to <code class="docutils literal notranslate"><span class="pre">2</span> <span class="pre">*</span> <span class="pre">dim</span></code>.</p></li>
+<li><p><strong>accuracy</strong> (<em>float</em><em>, </em><em>optional</em>) – Accuracy in the conjugate gradient algorithm.
+Default is <cite>1e-7</cite>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>stat</strong> (<em>torch.Tensor</em>) – Test statistic at level <code class="docutils literal notranslate"><span class="pre">alpha</span></code>. Reject null if it is larger than 1.</p></li>
+<li><p><strong>tau</strong> (<em>int</em>) – Location of changepoint corresponds to the test statistic.</p></li>
+<li><p><strong>index</strong> (<em>array-like</em>) – Indices of parameters correspond to the test statistic. It will be omitted for the linear test.</p></li>
+</ul>
+</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>NameError</strong> – If <code class="docutils literal notranslate"><span class="pre">stat_type</span></code> is not in <code class="docutils literal notranslate"><span class="pre">['linear',</span> <span class="pre">'scan',</span> <span class="pre">'autograd',</span> <span class="pre">'all']</span></code>;
+    or if <code class="docutils literal notranslate"><span class="pre">computation</span></code> is not in <code class="docutils literal notranslate"><span class="pre">['conjugate,</span> <span class="pre">'standard']</span></code>.</p></li>
+<li><p><strong>ValueError</strong> – If <code class="docutils literal notranslate"><span class="pre">alpha</span></code> is not an instance of <code class="docutils literal notranslate"><span class="pre">float</span></code> or <code class="docutils literal notranslate"><span class="pre">list</span></code>; or if <code class="docutils literal notranslate"><span class="pre">prange</span></code>
+    is not within <code class="docutils literal notranslate"><span class="pre">range(1,</span> <span class="pre">len(idx)+1)</span></code>; or if <code class="docutils literal notranslate"><span class="pre">trange</span></code> is not within
+    <code class="docutils literal notranslate"><span class="pre">range(lag,</span> <span class="pre">size)</span></code>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="autodetect.AutogradTest.gradients">
+<span class="sig-name descname"><span class="pre">gradients</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#autodetect.AutogradTest.gradients" title="Link to this definition"></a></dt>
+<dd><p>Get gradient of model parameters.</p>
+<p>Returns an 1D <code class="docutils literal notranslate"><span class="pre">Tensor</span></code> contains the gradient of parameters.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="autodetect.AutogradTest.information">
+<span class="sig-name descname"><span class="pre">information</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inputs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">targets</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#autodetect.AutogradTest.information" title="Link to this definition"></a></dt>
+<dd><p>Compute score function and information matrix.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="autodetect.AutogradTest.inv_info_vec_prod">
+<span class="sig-name descname"><span class="pre">inv_info_vec_prod</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inputs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">targets</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">accuracy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-07</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#autodetect.AutogradTest.inv_info_vec_prod" title="Link to this definition"></a></dt>
+<dd><p>Compute inverse-information-vector product.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="autodetect.AutogradTest.log_likelihood">
+<span class="sig-name descname"><span class="pre">log_likelihood</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inputs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">targets</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#autodetect.AutogradTest.log_likelihood" title="Link to this definition"></a></dt>
+<dd><p>Compute log-likelihood.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="autodetect.AutogradTest.score_func">
+<span class="sig-name descname"><span class="pre">score_func</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inputs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">targets</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#autodetect.AutogradTest.score_func" title="Link to this definition"></a></dt>
+<dd><p>Compute score function.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="autodetect.AutogradTest.vec_info_prod">
+<span class="sig-name descname"><span class="pre">vec_info_prod</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inputs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">targets</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">create_graph</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#autodetect.AutogradTest.vec_info_prod" title="Link to this definition"></a></dt>
+<dd><p>Compute vector-information product.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="autodetect.AutogradTest.zero_grad">
+<span class="sig-name descname"><span class="pre">zero_grad</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#autodetect.AutogradTest.zero_grad" title="Link to this definition"></a></dt>
+<dd><p>Set gradient of the model to zero.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="api.html" class="btn btn-neutral float-left" title="API Summary" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="latent.html" class="btn btn-neutral float-right" title="Latent Variable Models" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2019, Lang Liu, Joseph Salmon, and Zaid Harchaoui..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
