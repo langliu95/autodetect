@@ -18,7 +18,7 @@ $ cd autodetect/
 ```
 
 ## Documentation
-The documentation for this package can be found [here](https://www.stat.washington.edu/~liu16/autodetect/).
+The documentation for this package can be found [here](https://langliu95.github.io/autodetect/).
 
 ## Authors
 * Lang Liu
