@@ -39,7 +39,7 @@ dependencies = [
 [project.optional-dependencies]
 docs = [
     "sphinx>=6.0.0",
-    "sphinx_book_theme>=1.0.1",
+    "sphinx-rtd-theme>=3.0.2",
     "sphinxcontrib-katex",
     "sphinx-autodoc-typehints",
     "ipython>=8.8.0",
